@@ -18,6 +18,13 @@ const authentValidatSchema = {
         notEmpty: {
             errorMessage: "Password cannot be empty."
         },
+        isLength: {
+            options: {
+                min: 3,
+                max: 32,
+            },
+            errorMessage: 'Password must be at least 5 characters with a maximum of 32 characters.'
+        },
         isString: {
             errorMessage: "Password must be a string."
         }
