@@ -23,7 +23,7 @@ describe('GET  /api/users', () => {
                 const response = await request(router).get(`/api/users/${userID}`);
                 expect(response.statusCode).toBe(400);
             })
-            test('should respond with a 404 status because ID does not exist', async () => {
+            test('should respond with a 404 status because user with this ID does not exist', async () => {
                 const userID = 10;
                 const response = await request(router).get(`/api/users/${userID}`);
                 expect(response.statusCode).toBe(404);

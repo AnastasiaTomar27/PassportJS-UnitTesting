@@ -23,6 +23,7 @@ router.get(
 
 router.get("/api/users/:id", (request, response) => {
     const parsedId = parseInt(request.params.id);
+    console.log(parsedId);
     if (isNaN(parsedId)) return response.status(400).send({ msg: "Bad Request. Invalid ID" });
     
     const findUser = mockUsers.find((user) => user.id === parsedId);
