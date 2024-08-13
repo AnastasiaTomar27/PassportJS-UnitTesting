@@ -5,7 +5,7 @@ const authentValidatSchema = {
                 min: 3,
                 max: 32,
             },
-            errorMessage: 'Username must be at least 5 characters with a maximum of 32 characters.'
+            errorMessage: 'Username must be at least 3 characters with a maximum of 32 characters.'
         },
         notEmpty: {
             errorMessage: "Username cannot be empty."
