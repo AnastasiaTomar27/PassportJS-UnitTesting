@@ -17,12 +17,14 @@ describe('GET  /api/users', () => {
     })
 
     describe("get user by ID", () => {
-
-        test('should get user by id', async () => {
-            const userID = 'hfhfhgf'
-            const response = await request(router).get(`/api/users/${userID}`);
-            expect(response.statusCode).toBe(400);
+        describe("not valid user ID", () => {
+            test('should respond with a 400 status because ID is a string', async () => {
+                const userID = 'hfhfhgf'
+                const response = await request(router).get(`/api/users/${userID}`);
+                expect(response.statusCode).toBe(400);
+            })
         })
+        
     })
     
 })
