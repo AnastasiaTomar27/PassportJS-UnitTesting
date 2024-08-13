@@ -3,7 +3,6 @@ const { validationResult, checkSchema, matchedData } = require('express-validato
 const mockUsers = require('../utils/constants');
 const schema = require('../utils/validationSchemas');
 
-
 const router = Router();
 
 router.get(
@@ -18,7 +17,7 @@ router.get(
             }
             console.log(sessionData);
         });
-        response.send(mockUsers);
+        response.send({Users: mockUsers});
     }
 );
 
@@ -28,7 +27,7 @@ router.get("/api/users/:id", (request, response) => {
     
     const findUser = mockUsers.find((user) => user.id === parsedId);
     if (!findUser) return response.sendStatus(404);
-    return response.send(findUser);
+    return response.send({user: findUser});
 });
 
 router.post(

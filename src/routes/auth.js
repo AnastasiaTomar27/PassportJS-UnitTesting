@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { validationResult, checkSchema, matchedData } = require('express-validator');
+//const { validationResult, checkSchema, matchedData } = require('express-validator');
 const mockUsers = require('../utils/constants');
 const schema = require('../utils/authentValidatSchemas');
 const passport = require('../strategies/local-strategy');

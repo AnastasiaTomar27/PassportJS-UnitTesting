@@ -8,7 +8,7 @@ const session = require('express-session');
 const passport = require('passport');
 
 const app = express();
-app.use(express.json());
+app.use(express.json()); // we are telling Express to allow json data to be posted to the server
 app.use(cookieParser("session js learning"));
 app.use(
     session({
