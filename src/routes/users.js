@@ -27,7 +27,7 @@ router.get("/api/users/:id", (request, response) => {
     
     const findUser = mockUsers.find((user) => user.id === parsedId);
     if (!findUser) return response.sendStatus(404);
-    return response.send({user: findUser});
+    return response.send(findUser);
 });
 
 router.post(

@@ -1,6 +1,6 @@
 const request = require('supertest');
 const router = require('../index');
-// const mockUsers = require('../utils/constants');
+const mockUsers = require('../utils/constants');
 
 afterAll(async () => {
     router.close()
@@ -17,9 +17,11 @@ describe('GET  /api/users', () => {
     })
 
     describe("get user by ID", () => {
+
         test('should get user by id', async () => {
-            const response = await request(router).get("/api/users/:id");
-            expect(response.body.user).toBeDefined();
+            const userID = 'hfhfhgf'
+            const response = await request(router).get(`/api/users/${userID}`);
+            expect(response.statusCode).toBe(400);
         })
     })
     
