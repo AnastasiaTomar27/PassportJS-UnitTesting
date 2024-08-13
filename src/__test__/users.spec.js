@@ -43,7 +43,7 @@ describe('GET  /api/users', () => {
 
 // describe('POST /api/users - adding a new user', () => {
 //     describe('', () => {
-//         test("username length")
+//         test("username length is not between ")
 //     })
 // })
 
