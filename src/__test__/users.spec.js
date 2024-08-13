@@ -19,9 +19,14 @@ describe('GET  /api/users', () => {
     describe("get user by ID", () => {
         describe("not valid user ID", () => {
             test('should respond with a 400 status because ID is a string', async () => {
-                const userID = 'hfhfhgf'
+                const userID = 'hjkkhh';
                 const response = await request(router).get(`/api/users/${userID}`);
                 expect(response.statusCode).toBe(400);
+            })
+            test('should respond with a 404 status because ID does not exist', async () => {
+                const userID = 10;
+                const response = await request(router).get(`/api/users/${userID}`);
+                expect(response.statusCode).toBe(404);
             })
         })
         
