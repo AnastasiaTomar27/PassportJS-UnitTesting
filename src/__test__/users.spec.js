@@ -2,6 +2,7 @@ const request = require('supertest');
 const router = require('../index');
 const mockUsers = require('../utils/constants');
 const schema = require('../utils/validationSchemas');
+const { password } = require('../utils/authentValidatSchemas');
 
 
 afterAll(async () => {
@@ -47,23 +48,22 @@ describe('GET  /api/users', () => {
     
 })
 
-// describe('POST /api/users - adding a new user', () => {
-//     describe('', () => {
-//         test("username length is not between 3-32 characters", async () => {
-//             const response = await request(router).post("/api/auth").send({
-//                 username: "an"
-//             });
+describe('POST /api/users - adding a new user', () => {
+    describe('username length is not between 3-32 characters', () => {
+        test("should respond with a 400 status code", async () => {
+            const response = await request(router).post("/api/auth").send({
+                username: "an"
+            });
     
-//             expect(response.statusCode).toBe(400);
-//             expect(response.body.message).toBe({errors});
+            expect(response.statusCode).toBe(400);
 
-//         })
-//     })
-// })
+        })
+    })
+})
 
 describe('AUTHANTICATION  /api/auth', () => {
 
-    describe("given a username and password", () => {
+    describe("given a correct username and password", () => {
         test('should respond with a 200 status code', async () => {
             const response = await request(router).post("/api/auth").send({
                 username: "anastasia",
@@ -71,11 +71,12 @@ describe('AUTHANTICATION  /api/auth', () => {
             });
     
             expect(response.statusCode).toBe(200);
+            expect(response.body.message).toBe("Successfully authenticated!");
         })
         
     })
     
-    describe("when the username and password is missing", () => {
+    describe("when the username and/or password is missing", () => {
         test("should respond with a status code of 400", async () => {
             const bodyData = [
                 {username: "anastasia"},
@@ -88,5 +89,19 @@ describe('AUTHANTICATION  /api/auth', () => {
             }
         })
     })
+
+    // describe("when the username and/or password are incorrect", () => {
+    //     test("should throw an error", async () => {
+    //         const bodyData = [
+    //             {username: "anasta", password: "hello123"},
+    //             {password: "hello", username: "anastasia"}
+    //         ]
+    //         for (const body of bodyData) {
+    //             const response = await request(router).post("/api/auth").send(body)
+    //             expect()
+    //         }
+            
+    //     })
+    // })
     
 })
