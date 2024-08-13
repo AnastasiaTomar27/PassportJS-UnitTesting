@@ -39,6 +39,7 @@ describe('GET  /api/users', () => {
                 const userId = 1;
                 const response = await request(router).get(`/api/users/${userId}`);
                 expect(response.statusCode).toBe(200);
+                expect(response.Users).toEqual[{"displayName": "Anastasia", "id": 1, "password": "hello123", "username": "anastasia"}] 
             })
         })
         
