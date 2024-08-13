@@ -27,7 +27,7 @@ router.get("/api/users/:id", (request, response) => {
     if (isNaN(parsedId)) return response.status(400).send({ message: "Bad Request. Invalid ID" });
     
     const findUser = mockUsers.find((user) => user.id === parsedId);
-    if (!findUser) return response.sendStatus(404);
+    if (!findUser) return response.status(404).send({message: "User does not exist"});
     return response.send(findUser);
 });
 

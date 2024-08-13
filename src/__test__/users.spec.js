@@ -31,6 +31,7 @@ describe('GET  /api/users', () => {
                 const userID = 10;
                 const response = await request(router).get(`/api/users/${userID}`);
                 expect(response.statusCode).toBe(404);
+                expect(response.body.message).toBe("User does not exist");
             })
         })
         describe("valid user ID", () => {
