@@ -29,12 +29,23 @@ describe('GET  /api/users', () => {
                 expect(response.statusCode).toBe(404);
             })
         })
+        describe("valid user ID", () => {
+            test("should rspond with a 200 status", async () => {
+                const userId = 1;
+                const response = await request(router).get(`/api/users/${userId}`);
+                expect(response.statusCode).toBe(200);
+            })
+        })
         
     })
     
 })
 
-
+// describe('POST /api/users - adding a new user', () => {
+//     describe('', () => {
+//         test("username length")
+//     })
+// })
 
 describe('AUTHANTICATION  /api/auth', () => {
 
