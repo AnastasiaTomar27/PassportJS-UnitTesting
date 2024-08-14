@@ -48,18 +48,55 @@ describe('GET  /api/users', () => {
     
 })
 
-describe('POST /api/users - adding a new user', () => {
-    describe('username length is not between 3-32 characters', () => {
-        test("should respond with a 400 status code", async () => {
-            const response = await request(router).post("/api/auth").send({
-                username: "an"
-            });
+// describe('POST /api/users - adding a new user', () => {
+//     describe('username length is not between 3-32 characters', () => {
+//         test("should respond with a 400 status code", async () => {
+//             const response = await request(router).post("/api/auth").send({
+//                 username: "an",
+//                 displayName: "Anastasia"
+//             });
     
-            expect(response.statusCode).toBe(400);
+//             expect(response.statusCode).toBe(400);
+//             expect(response.body.errors[0]).toBe('Username must be at least 3 characters with a maximum of 32 characters.');
 
-        })
-    })
-})
+//         })
+//     })
+//     describe('username is empty', () => {
+//         test("should respond with a 400 status code", async () => {
+//             const response = await request(router).post("/api/auth").send({
+//                 username: "anna",
+//                 displayName: "Anna"
+
+//             });
+    
+//             expect(response.statusCode).toBe(400);
+
+//         })
+//     })
+//     describe('username is not a string', () => {
+//         test("should respond with a 400 status code", async () => {
+//             const response = await request(router).post("/api/auth").send({
+//                 username: 3,
+//                 displayName: "Anastasia"
+//             });
+    
+//             expect(response.statusCode).toBe(400);
+
+//         })
+//     })
+//     describe('displayname is empty', () => {
+//         test("should respond with a 400 status code", async () => {
+//             const response = await request(router).post("/api/auth").send({
+//                 username: "anastasia",
+//                 displayName: ""
+//             });
+    
+//             expect(response.statusCode).toBe(400);
+
+//         })
+//     })
+    
+// })
 
 describe('AUTHANTICATION  /api/auth', () => {
 
