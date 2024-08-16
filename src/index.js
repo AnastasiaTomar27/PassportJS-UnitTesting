@@ -1,8 +1,6 @@
 const express = require('express');
-const usersRouter = require('./routes/users');
-const productsRouter = require('./routes/products');
-const authRouter = require('./routes/auth');
-const cartRouter = require('./routes/cart');
+require('module-alias/register');
+const rootRouter = require('@root');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
@@ -23,11 +21,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(usersRouter);
-app.use(productsRouter);
-app.use(authRouter);
-app.use(cartRouter);
+app.use(rootRouter);
 
 const PORT = process.env.PORT || 3000;
 
