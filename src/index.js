@@ -1,6 +1,6 @@
 const express = require('express');
 require('module-alias/register');
-const rootRouter = require('@rootRauter');
+const rootRouter = require('@root');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');

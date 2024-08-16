@@ -25,11 +25,10 @@
     "@constants": "src/utils/constants.js",
     "@authSchemas": "src/utils/authSchemas.js",
     "@local-strategy": "src/strategies/local-strategy.js",
-    "@rootRauter": "src/routes/root.js",
+    "@root": "src/routes/root.js",
     "@users": "src/routes/users.js",
     "@cart": "src/routes/cart.js",
     "@products": "src/routes/products.js",
-    "@root": "src/routes/root.js",
     "@auth": "src/routes/auth.js",
     "@cartValidationSchemas": "src/utils/cartValidationSchemas.js",
     "@validationSchemas": "src/utils/validationSchemas.js"
