@@ -1,8 +1,8 @@
 const { Router } = require('express');
 //const { validationResult, checkSchema, matchedData } = require('express-validator');
-const mockUsers = require('@constants');
-const schema = require('@authSchemas');
-const passport = require('@local-strategy');
+const mockUsers = require('../utils/constants');
+const schema = require('../utils/authSchemas');
+const passport = require('../strategies/local-strategy');
 
 const router = Router();
 // router.post(

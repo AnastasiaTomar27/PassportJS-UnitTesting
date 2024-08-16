@@ -1,6 +1,6 @@
 const express = require('express');
-require('module-alias/register');
-const rootRouter = require('@root');
+// require('module-alias/register');
+const rootRouter = require('./routes/root');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
@@ -23,7 +23,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(rootRouter);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 const server = app.listen(PORT, () => {
     console.log(`Running on Port ${PORT}`);
@@ -38,3 +38,21 @@ app.get("/", (request, response) => {
 });
 
 module.exports = server;
+
+// "_moduleAliases": {
+//     "@approot": ".",
+//     "@constants": "src/utils/constants.js",
+//     "@authSchemas": "src/utils/authSchemas.js",
+//     "@local-strategy": "src/strategies/local-strategy.js",
+//     "@root": "src/routes/root.js",
+//     "@users": "src/routes/users.js",
+//     "@cart": "src/routes/cart.js",
+//     "@products": "src/routes/products.js",
+//     "@auth": "src/routes/auth.js",
+//     "@cartValidationSchemas": "src/utils/cartValidationSchemas.js",
+//     "@validationSchemas": "src/utils/validationSchemas.js"    
+//   },
+//   "-moduleDirectories": [
+//     "src",
+//     "src/utils"
+//   ],

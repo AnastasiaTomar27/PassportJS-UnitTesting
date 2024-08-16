@@ -20,30 +20,6 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0"
   },
-  "_moduleAliases": {
-    "@approot": ".",
-    "@constants": "src/utils/constants.js",
-    "@authSchemas": "src/utils/authSchemas.js",
-    "@local-strategy": "src/strategies/local-strategy.js",
-    "@root": "src/routes/root.js",
-    "@users": "src/routes/users.js",
-    "@cart": "src/routes/cart.js",
-    "@products": "src/routes/products.js",
-    "@auth": "src/routes/auth.js",
-    "@cartValidationSchemas": "src/utils/cartValidationSchemas.js",
-    "@validationSchemas": "src/utils/validationSchemas.js"
-
-
-
-
-
-
-    
-  },
-  "-moduleDirectories": [
-    "src",
-    "src/utils"
-  ],
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "jest": "^29.7.0",

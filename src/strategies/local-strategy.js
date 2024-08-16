@@ -1,6 +1,6 @@
 const passport = require('passport');
 const { Strategy } = require('passport-local');
-const mockUsers = require('@constants');
+const mockUsers = require('../utils/constants');
 
 passport.serializeUser((user, done) => { // to tell passport how to serialize user data into the session (it stores user ID to session data)
     console.log('Inside Serialize User');
