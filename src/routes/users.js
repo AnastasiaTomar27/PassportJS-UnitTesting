@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { validationResult, checkSchema, matchedData } = require('express-validator');
-const mockUsers = require('../utils/constants');
-const schema = require('../utils/validationSchemas');
+const mockUsers = require('@constants');
+const schema = require('@validationSchemas');
 
 const router = Router();
 
