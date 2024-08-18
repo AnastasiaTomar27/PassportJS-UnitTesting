@@ -43,9 +43,17 @@ router.post(
 router.get('/api/auth/status', (request, response) => {
     console.log('Inside /auth/status endpoint');
     console.log(request.user);
+    console.log(request.session);
     return request.user ? response.send(request.user) : response.sendStatus(401);
 });
 
+router.post('/api/auth/logout', (request, response) => {
+    if (!request.user) return response.sendStatus(401);
+    request.logout((err) => {
+        if (err) return response.sendStatus(400);
+        response.sendStatus(200);
+    });
+});
 
 
 module.exports = router;

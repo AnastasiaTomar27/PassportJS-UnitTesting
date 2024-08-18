@@ -1,9 +1,9 @@
 const express = require('express');
-// require('module-alias/register');
 const rootRouter = require('./routes/root');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
+
 
 const app = express();
 app.use(express.json()); // we are telling Express to allow json data to be posted to the server
@@ -23,7 +23,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(rootRouter);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
     console.log(`Running on Port ${PORT}`);
@@ -52,7 +52,7 @@ module.exports = server;
 //     "@cartValidationSchemas": "src/utils/cartValidationSchemas.js",
 //     "@validationSchemas": "src/utils/validationSchemas.js"    
 //   },
-//   "-moduleDirectories": [
+//   "_moduleDirectories": [
 //     "src",
 //     "src/utils"
 //   ],

@@ -5,6 +5,18 @@ const schema = require('../utils/validationSchemas');
 
 const router = Router();
 
+const resolveIndexByUserId = (request, response, next) => {
+    const {
+        params: {id},
+    } = request;
+    const parsedId = parseInt(id);
+    if (isNaN(parsedId)) return response.sendStatus(400);
+    const findUserIndex = mockUsers.findIndex((user) => user.id === parsedId);
+    if (findUserIndex === -1) return response.sendStatus(404);
+    request.findUserIndex = findUserIndex;
+    next();
+}
+
 router.get(
     "/api/users",
     (request, response) => {
@@ -29,6 +41,24 @@ router.get("/api/users/:id", (request, response) => {
     const findUser = mockUsers.find((user) => user.id === parsedId);
     if (!findUser) return response.status(404).send({message: "User does not exist"});
     return response.send(findUser);
+});
+
+router.put("/api/users/:id", resolveIndexByUserId, (request, response) => {
+    const { body, findUserIndex } = request;
+    mockUsers[findUserIndex] = { id: mockUsers[findUserIndex].id, ...body };
+    return response.sendStatus(200);
+});
+
+router.patch('/api/users/:id', resolveIndexByUserId, (request, response) => {
+    const { body, findUserIndex } = request;
+    mockUsers[findUserIndex] = { ...mockUsers[findUserIndex], ...body };
+    return response.sendStatus(200);
+});
+
+router.delete('/api/users/:id', resolveIndexByUserId, (request, response) => {
+    const { findUserIndex } = request;
+    mockUsers.splice(findUserIndex, 1);    
+    return response.sendStatus(200);
 });
 
 router.post(
