@@ -3,10 +3,15 @@ const rootRouter = require('./routes/root');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
-
+const mongoose = require('mongoose');
 
 const app = express();
-app.use(express.json()); // we are telling Express to allow json data to be posted to the server
+    
+mongoose.connect("mongodb://localhost/expressJS")
+    .then(() => console.log('Connected to Database'))
+    .catch((err) => console.log(`Error: ${err}`));
+
+    app.use(express.json()); // we are telling Express to allow json data to be posted to the server
 app.use(cookieParser("session js learning"));
 app.use(
     session({

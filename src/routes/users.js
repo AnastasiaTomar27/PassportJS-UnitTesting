@@ -2,20 +2,9 @@ const { Router } = require('express');
 const { validationResult, checkSchema, matchedData } = require('express-validator');
 const mockUsers = require('../utils/constants');
 const schema = require('../utils/validationSchemas');
-
+const User = require('../mongoose/schemas/user');
+const resolveIndexByUserId = require('../utils/middlewares');
 const router = Router();
-
-const resolveIndexByUserId = (request, response, next) => {
-    const {
-        params: {id},
-    } = request;
-    const parsedId = parseInt(id);
-    if (isNaN(parsedId)) return response.sendStatus(400);
-    const findUserIndex = mockUsers.findIndex((user) => user.id === parsedId);
-    if (findUserIndex === -1) return response.sendStatus(404);
-    request.findUserIndex = findUserIndex;
-    next();
-}
 
 router.get(
     "/api/users",
@@ -64,7 +53,7 @@ router.delete('/api/users/:id', resolveIndexByUserId, (request, response) => {
 router.post(
     "/api/users", 
     checkSchema(schema), 
-    (request, response) => {
+    async (request, response) => {
         const result = validationResult(request);
 
         if (!result.isEmpty())
@@ -72,9 +61,20 @@ router.post(
 
         const data = matchedData(request);
 
-        const newUser = { id: mockUsers[mockUsers.length - 1].id + 1, ...data };
-        mockUsers.push(newUser);
-        return response.status(201).send(newUser);
-    })
+        // Saving user to mockUsers
+        // const newUser = { id: mockUsers[mockUsers.length - 1].id + 1, ...data };
+        // mockUsers.push(newUser);
+        // return response.status(201).send(newUser);
+    
+        // Saving user to the database
+        const newUser = new User(data);
+        try {
+            const savedUser = await newUser.save();
+            return response.status(201).send(savedUser);
+        } catch (err) {
+            console.log(err);
+            return response.sendStatus(400);
+        }
+    });
 
 module.exports = router;
