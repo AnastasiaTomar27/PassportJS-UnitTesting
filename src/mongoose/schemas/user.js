@@ -1,6 +1,4 @@
-const { Schema, default: mongoose } = require("mongoose");
-const { displayName } = require("../../utils/validationSchemas");
-const { password } = require("../../utils/authSchemas");
+const { mongoose } = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
     username: {

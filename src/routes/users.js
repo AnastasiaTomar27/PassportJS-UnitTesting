@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const { validationResult, checkSchema, matchedData, body } = require('express-validator');
 const mockUsers = require('../utils/constants');
-const schema = require('../utils/validationSchemas');
 const User = require('../mongoose/schemas/user');
 const resolveIndexByUserId = require('../utils/middlewares');
 const router = Router();
@@ -84,6 +83,7 @@ router.post(
             console.log(err);
             return response.sendStatus(400);
         }
-    });
+    }
+);
 
 module.exports = router;
