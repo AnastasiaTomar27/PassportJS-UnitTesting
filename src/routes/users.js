@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { validationResult, checkSchema, matchedData } = require('express-validator');
+const { validationResult, checkSchema, matchedData, body } = require('express-validator');
 const mockUsers = require('../utils/constants');
 const schema = require('../utils/validationSchemas');
 const User = require('../mongoose/schemas/user');
@@ -51,9 +51,17 @@ router.delete('/api/users/:id', resolveIndexByUserId, (request, response) => {
     return response.sendStatus(200);
 });
 
+// Creating an user/ Saving to the database
 router.post(
     "/api/users", 
-    checkSchema(schema), 
+    [
+    body("username").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString(),
+    body("displayName").notEmpty().isLength({ max: 100 }).withMessage('DisplayName must be maximum of 100 characters.').isString(),
+    // body("password").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString().custom(async value => {
+    //     if (!("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]){8,}$").test(value)) { throw new Error(); }
+    // }).withMessage("User password configuration is invalid")
+    body("password").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString()
+    ],
     async (request, response) => {
         const result = validationResult(request);
 

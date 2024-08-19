@@ -3,8 +3,12 @@ const { Router } = require('express');
 const mockUsers = require('../utils/constants');
 const schema = require('../utils/authSchemas');
 const passport = require('../strategies/local-strategy');
+const isAuthenticated = require('../utils/isAuthenticatedMiddleware');
 
 const router = Router();
+
+// without using database
+
 // router.post(
 //     '/api/auth', 
 //     checkSchema(schema), 
@@ -44,15 +48,14 @@ router.post(
         }
 })
 
-router.get('/api/auth/status', (request, response) => {
+router.get('/api/auth/status', isAuthenticated, (request, response) => {
     console.log('Inside /auth/status endpoint');
     console.log(request.user);
     console.log(request.session);
-    return request.user ? response.send(request.user) : response.sendStatus(401);
+    return response.send(request.user) 
 });
 
-router.post('/api/auth/logout', (request, response) => {
-    if (!request.user) return response.sendStatus(401);
+router.post('/api/auth/logout', isAuthenticated, (request, response) => {
     request.logout((err) => {
         if (err) return response.sendStatus(400);
         response.sendStatus(200);
