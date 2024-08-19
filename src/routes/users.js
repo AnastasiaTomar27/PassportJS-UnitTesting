@@ -6,6 +6,7 @@ const User = require('../mongoose/schemas/user');
 const resolveIndexByUserId = require('../utils/middlewares');
 const router = Router();
 
+
 router.get(
     "/api/users",
     (request, response) => {

@@ -37,7 +37,11 @@ router.post(
     '/api/auth', 
     passport.authenticate("local"), 
     (request, response) => {
-        response.status(200).send({message: "Successfully authenticated!"});
+        if (!request.user) {
+            response.status(401).json({ message: "Access Denied" })
+        } else {
+            response.status(200).send({message: "Successfully authenticated!"});
+        }
 })
 
 router.get('/api/auth/status', (request, response) => {
