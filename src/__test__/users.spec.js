@@ -1,7 +1,5 @@
 const request = require('supertest');
 const router = require('../index');
-const mockUsers = require('../utils/constants');
-//const { password } = require('../utils/authSchemas');
 
 
 afterAll(async () => {

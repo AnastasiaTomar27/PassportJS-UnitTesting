@@ -1,7 +1,7 @@
 const passport = require('passport');
 const { Strategy } = require('passport-local');
-const  mockUsers  = require('../utils/constants');
 const  User  = require('../mongoose/schemas/user');
+const { comparePassword } = require('../utils/helpers');
 
 passport.serializeUser((user, done) => { // to tell passport how to serialize user data into the session (it stores user ID to session data)
     console.log('Inside Serialize User');
@@ -25,16 +25,9 @@ passport.deserializeUser(async (id, done) => { // to take that ID and unpack, re
 passport.use(
     new Strategy(async (username, password, done) => {
         try {
-            // checking for an user in mockUsers
-            // const findUser = mockUsers.find((user) => user.username === username);
-            // if (!findUser) throw new Error('User not found.')
-            //     if (findUser.password !== password)
-            //         throw new Error("Invalid Credentials.");
-            
-            // checking for an user in the database
             const findUser = await User.findOne({ username });
             if (!findUser) throw new Error("User not found");
-            if (findUser.password !== password) throw new Error("Bad Credentials");
+            if (!comparePassword(password, findUser.password)) throw new Error("Bad Credentials");
             done(null, findUser);
         } catch (err) {
             done(err, null);

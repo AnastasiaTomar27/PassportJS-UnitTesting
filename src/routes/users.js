@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { validationResult, matchedData, body } = require('express-validator');
 const User = require('../mongoose/schemas/user');
+const hashPassword = require('../utils/helpers');
 const router = Router();
 
 
@@ -80,6 +81,7 @@ router.post(
             return response.status(400).send({ errors: result.array() });
 
         const data = matchedData(request);
+        data.password = hashPassword(data.password);
         const newUser = new User(data);
         try {
             const savedUser = await newUser.save();
