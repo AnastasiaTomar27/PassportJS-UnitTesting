@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo');
 
 const app = express();
     
@@ -20,7 +21,10 @@ app.use(
         resave: false,
         cookie: {
             maxAge: 60000 * 60
-        }
+        },
+        store: MongoStore.create({
+            client: mongoose.connection.getClient()
+    })
     })
 );
 
