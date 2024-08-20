@@ -1,58 +1,70 @@
 const { Router } = require('express');
-const { validationResult, checkSchema, matchedData, body } = require('express-validator');
-const mockUsers = require('../utils/constants');
+const { validationResult, matchedData, body } = require('express-validator');
 const User = require('../mongoose/schemas/user');
-const resolveIndexByUserId = require('../utils/middlewares');
 const router = Router();
 
 
 router.get(
-    "/api/users",
-    (request, response) => {
-        console.log(request.session);
-        console.log(request.session.id);
-        request.sessionStore.get(request.session.id, (err, sessionData) => {
-            if (err) {
-                console.log(err);
-                throw err;
-            }
-            console.log(sessionData);
-        });
-        response.send({Users: mockUsers});
+    "/api/users/getall", async (request, response) => {
+        try {
+            const data = await User.find();
+            return response.status(200).json(data);
+        } catch(err) {
+            console.log(err);
+            return response.sendStatus(400);
+        }
+});
+
+router.get("/api/users/getbyid/:id", async (request, response) => {
+    const id = request.params.id;
+    try {
+        const user = await User.findById(id);
+        return response.status(200).send(user);
+    } catch(err) {
+        console.log(err);
+        return response.sendStatus(400);
     }
-);
 
-router.get("/api/users/:id", (request, response) => {
-    const parsedId = parseInt(request.params.id);
-    console.log(parsedId);
-    if (isNaN(parsedId)) return response.status(400).send({ message: "Bad Request. Invalid ID" });
-    
-    const findUser = mockUsers.find((user) => user.id === parsedId);
-    if (!findUser) return response.status(404).send({message: "User does not exist"});
-    return response.send(findUser);
 });
 
-router.put("/api/users/:id", resolveIndexByUserId, (request, response) => {
-    const { body, findUserIndex } = request;
-    mockUsers[findUserIndex] = { id: mockUsers[findUserIndex].id, ...body };
-    return response.sendStatus(200);
+router.put("/api/users/update/:id", async (request, response) => {
+    const id = request.params.id;
+    try {
+        const user = await User.findByIdAndUpdate(id, request.body);
+        if (!user) {
+            return response.status(404).json({message: `Cannot find any user with ID ${id}` })
+        }
+        const updatedUser = await User.findById(id);
+        response.status(200).json(updatedUser);
+    } catch(err) {
+        console.log(err);
+        return response.sendStatus(400);
+    }
 });
 
-router.patch('/api/users/:id', resolveIndexByUserId, (request, response) => {
-    const { body, findUserIndex } = request;
-    mockUsers[findUserIndex] = { ...mockUsers[findUserIndex], ...body };
-    return response.sendStatus(200);
+// router.patch('/api/users/:id', (request, response) => {
+//     const { body, findUserIndex } = request;
+//     mockUsers[findUserIndex] = { ...mockUsers[findUserIndex], ...body };
+//     return response.sendStatus(200);
+// });
+
+router.delete('/api/users/delete/:id', async (request, response) => {
+    const id = request.params.id;
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            return response.status(404).json({message: `Cannot find any user with ID ${id}` })
+        }
+        await User.findByIdAndDelete(id);
+        response.status(201).json({message: "User deleted successfully"});
+    } catch(err) {
+        console.log(err);
+        return response.sendStatus(400);
+    }
 });
 
-router.delete('/api/users/:id', resolveIndexByUserId, (request, response) => {
-    const { findUserIndex } = request;
-    mockUsers.splice(findUserIndex, 1);    
-    return response.sendStatus(200);
-});
-
-// Creating an user/ Saving to the database
 router.post(
-    "/api/users", 
+    "/api/users/add", 
     [
     body("username").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString(),
     body("displayName").notEmpty().isLength({ max: 100 }).withMessage('DisplayName must be maximum of 100 characters.').isString(),
@@ -68,13 +80,6 @@ router.post(
             return response.status(400).send({ errors: result.array() });
 
         const data = matchedData(request);
-
-        // Saving user to mockUsers
-        // const newUser = { id: mockUsers[mockUsers.length - 1].id + 1, ...data };
-        // mockUsers.push(newUser);
-        // return response.status(201).send(newUser);
-    
-        // Saving user to the database
         const newUser = new User(data);
         try {
             const savedUser = await newUser.save();
