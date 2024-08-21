@@ -13,7 +13,7 @@ mongoose.connect("mongodb://localhost/expressJS")
     .catch((err) => console.log(`Error: ${err}`));
 
     app.use(express.json()); // we are telling Express to allow json data to be posted to the server
-app.use(cookieParser("session js learning"));
+app.use(cookieParser("session js learning")); // it makes the cookies easily readable from the request.cookies
 app.use(
     session({
         secret: "session js",
