@@ -6,7 +6,7 @@ const isAuthenticated = require('../utils/isAuthenticatedMiddleware');
 const router = Router();
 
 router.post(
-    '/api/users/auth', 
+    '/api/users/login', 
     [
         body("username").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString(),
         // body("password").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString().custom(async value => {

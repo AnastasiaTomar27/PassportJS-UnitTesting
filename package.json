@@ -18,7 +18,11 @@
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "express-validator": "^7.1.0",
+<<<<<<< HEAD
     "mongodb-memory-server": "^10.0.0",
+=======
+    "jsonwebtoken": "^9.0.2",
+>>>>>>> 65fde4af2801cde6f1522129a316bab4ea60b627
     "mongoose": "^8.5.3",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0"

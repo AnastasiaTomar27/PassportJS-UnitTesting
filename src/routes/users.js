@@ -5,10 +5,17 @@ const { hashPassword } = require('../utils/helpers');
 
 const router = Router();
 
+<<<<<<< HEAD
 // router.get('/', (req, res) => {
 //     req.session.user = 'testUser';
 //     res.send('Session set');
 //   });
+=======
+router.get('/', (req, res) => {
+    req.session.user = 'testUser';
+    res.send('Session set');
+  });
+>>>>>>> 65fde4af2801cde6f1522129a316bab4ea60b627
 
 router.get(
     "/api/users/getall", async (request, response) => {

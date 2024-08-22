@@ -6,6 +6,19 @@
 //     router.close()
 //   });
 
+describe('Session Cookie', () => {
+    it('should set a session cookie', async () => {
+        const response = await request(router).get('/')
+        .expect(200);  
+
+        const cookies = response.headers['set-cookie'];
+        expect(cookies).toBeDefined();
+
+        const sessionCookie = cookies.find(cookie => cookie.startsWith('connect.sid='));
+        expect(sessionCookie).toBeDefined();
+
+    });
+});
 
 // describe('GET  /api/users', () => {
 
