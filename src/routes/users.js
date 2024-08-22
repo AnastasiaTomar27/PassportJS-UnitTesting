@@ -1,9 +1,14 @@
 const { Router } = require('express');
 const { validationResult, matchedData, body } = require('express-validator');
 const User = require('../mongoose/schemas/user');
-const hashPassword = require('../utils/helpers');
+const { hashPassword } = require('../utils/helpers');
+
 const router = Router();
 
+// router.get('/', (req, res) => {
+//     req.session.user = 'testUser';
+//     res.send('Session set');
+//   });
 
 router.get(
     "/api/users/getall", async (request, response) => {
@@ -65,7 +70,7 @@ router.delete('/api/users/delete/:id', async (request, response) => {
 });
 
 router.post(
-    "/api/users/add", 
+    "/api/users/register", 
     [
     body("username").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString(),
     body("displayName").notEmpty().isLength({ max: 100 }).withMessage('DisplayName must be maximum of 100 characters.').isString(),
