@@ -6,13 +6,13 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo');
 
-const app = express();
-    
+
+app = express();   
 mongoose.connect("mongodb://localhost/expressJS")
     .then(() => console.log('Connected to Database'))
     .catch((err) => console.log(`Error: ${err}`));
 
-    app.use(express.json()); // we are telling Express to allow json data to be posted to the server
+app.use(express.json()); // we are telling Express to allow json data to be posted to the server
 app.use(cookieParser("session js learning")); // it makes the cookies easily readable from the request.cookies
 app.use(
     session({
@@ -32,21 +32,21 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(rootRouter);
 
-const PORT = process.env.PORT || 8002;
+const PORT = process.env.PORT || 8009;
 
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Running on Port ${PORT}`);
 });
 
-app.get("/", (request, response) => {
-    console.log(request.session);
-    console.log(request.session.id);
-    request.session.visited = true;
-    response.cookie("hello", "world", {maxAge: 60000 * 60 * 2, signed: true });
-    response.status(201).send({msg: "Hello"});
-});
+// app.get("/", (request, response) => {
+//     console.log(request.session);
+//     console.log(request.session.id);
+//     request.session.visited = true;
+//     response.cookie("hello", "world", {maxAge: 60000 * 60 * 2, signed: true });
+//     response.status(201).send({msg: "Hello"});
+// });
 
-module.exports = server;
+module.exports = app;
 
 // "_moduleAliases": {
 //     "@approot": ".",

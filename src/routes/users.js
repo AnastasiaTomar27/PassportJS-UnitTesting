@@ -5,26 +5,14 @@ const { hashPassword } = require('../utils/helpers');
 
 const router = Router();
 
-<<<<<<< HEAD
-// router.get('/', (req, res) => {
-//     req.session.user = 'testUser';
-//     res.send('Session set');
-//   });
-=======
-router.get('/', (req, res) => {
-    req.session.user = 'testUser';
-    res.send('Session set');
-  });
->>>>>>> 65fde4af2801cde6f1522129a316bab4ea60b627
-
 router.get(
     "/api/users/getall", async (request, response) => {
         try {
             const data = await User.find();
-            return response.status(200).json(data);
+            return response.json(data);
         } catch(err) {
             console.log(err);
-            return response.sendStatus(400);
+            return response.sendStatus(400).response.json(data);
         }
 });
 
@@ -32,7 +20,7 @@ router.get("/api/users/getbyid/:id", async (request, response) => {
     const id = request.params.id;
     try {
         const user = await User.findById(id);
-        return response.status(200).send(user);
+        return response.sendStatus(200).send(user);
     } catch(err) {
         console.log(err);
         return response.sendStatus(400);
@@ -45,10 +33,10 @@ router.put("/api/users/update/:id", async (request, response) => {
     try {
         const user = await User.findByIdAndUpdate(id, request.body);
         if (!user) {
-            return response.status(404).json({message: `Cannot find any user with ID ${id}` })
+            return response.sendStatus(404).json({message: `Cannot find any user with ID ${id}` })
         }
         const updatedUser = await User.findById(id);
-        response.status(200).json(updatedUser);
+        response.sendStatus(200).json(updatedUser);
     } catch(err) {
         console.log(err);
         return response.sendStatus(400);
@@ -66,10 +54,10 @@ router.delete('/api/users/delete/:id', async (request, response) => {
     try {
         const user = await User.findById(id);
         if (!user) {
-            return response.status(404).json({message: `Cannot find any user with ID ${id}` })
+            return response.sendStatus(404).json({message: `Cannot find any user with ID ${id}` })
         }
         await User.findByIdAndDelete(id);
-        response.status(201).json({message: "User deleted successfully"});
+        response.sendStatus(201).json({message: "User deleted successfully"});
     } catch(err) {
         console.log(err);
         return response.sendStatus(400);
@@ -90,14 +78,14 @@ router.post(
         const result = validationResult(request);
 
         if (!result.isEmpty())
-            return response.status(400).send({ errors: result.array() });
+            return response.sendStatus(400).send({ errors: result.array() });
 
         const data = matchedData(request);
         data.password = hashPassword(data.password);
         const newUser = new User(data);
         try {
             const savedUser = await newUser.save();
-            return response.status(201).send(savedUser);
+            return response.sendStatus(201).send(savedUser);
         } catch (err) {
             console.log(err);
             return response.sendStatus(400);

@@ -7,6 +7,7 @@
     "start:dev": "nodemon ./src/index.js",
     "start": "node ./src/index.js"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -15,22 +16,21 @@
     "bcrypt": "^5.1.1",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "express-validator": "^7.1.0",
-<<<<<<< HEAD
-    "mongodb-memory-server": "^10.0.0",
-=======
     "jsonwebtoken": "^9.0.2",
->>>>>>> 65fde4af2801cde6f1522129a316bab4ea60b627
     "mongoose": "^8.5.3",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "@shelf/jest-mongodb": "^4.3.2",
     "@types/jest": "^29.5.12",
+    "@types/mongodb": "^4.0.6",
+    "@types/supertest": "^6.0.2",
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.0.0",
     "nodemon": "^3.1.4",
     "supertest": "^7.0.0",
     "webpack": "^5.93.0",
