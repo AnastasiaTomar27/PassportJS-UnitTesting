@@ -1,41 +1,8 @@
-const express = require('express');
-const rootRouter = require('./routes/root');
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const passport = require('passport');
-const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo');
+const app = require('./app')
+const port = process.env.PORT || 3000;
 
-
-app = express();   
-mongoose.connect("mongodb://localhost/expressJS")
-    .then(() => console.log('Connected to Database'))
-    .catch((err) => console.log(`Error: ${err}`));
-
-app.use(express.json()); // we are telling Express to allow json data to be posted to the server
-app.use(cookieParser("session js learning")); // it makes the cookies easily readable from the request.cookies
-app.use(
-    session({
-        secret: "session js",
-        saveUninitialized: false,
-        resave: false,
-        cookie: {
-            maxAge: 60000 * 60
-        },
-        store: MongoStore.create({
-            client: mongoose.connection.getClient()
-    })
-    })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(rootRouter);
-
-const PORT = process.env.PORT || 8009;
-
-app.listen(PORT, () => {
-    console.log(`Running on Port ${PORT}`);
+app.listen(port, () => {
+    console.log(`Running on Port ${port}`);
 });
 
 // app.get("/", (request, response) => {

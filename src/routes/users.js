@@ -78,17 +78,17 @@ router.post(
         const result = validationResult(request);
 
         if (!result.isEmpty())
-            return response.sendStatus(400).send({ errors: result.array() });
+            return response.status(400).send({ errors: result.array() });
 
         const data = matchedData(request);
         data.password = hashPassword(data.password);
         const newUser = new User(data);
         try {
             const savedUser = await newUser.save();
-            return response.sendStatus(201).send(savedUser);
+            return response.status(201).send(savedUser);
         } catch (err) {
             console.log(err);
-            return response.sendStatus(400);
+            return response.status(400);
         }
     }
 );
