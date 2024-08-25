@@ -9,15 +9,20 @@ const user1 = {
 }
 
 let userId;
+let agent;
 
 beforeEach(async() => {
     await User.deleteMany({})
     const response = await request(app).post('/api/users/register').send(user1)
 
     userId = response.body._id;
-    console.log(userId)
-    
-})
+
+    agent = request.agent(app);
+    await agent.post('/api/users/auth').send({
+        username:user1.username,
+        password: user1.password
+    });
+});
 describe("Register user", () => {
     describe("sign up for a user with correct credentials", () => {
         test('should respond with a 201 status code and user details', async () => {
@@ -91,8 +96,8 @@ describe("Register user", () => {
         })
     })
 })
-describe("Log in user", () => {
-    describe("Logging with valid credentialas", () => {
+describe("Authentication - Log in user", () => {
+    describe("Logging with valid credentials", () => {
         it('Should login for a user', async () => {
             const response = await request(app).post('/api/users/auth')
             .send({
@@ -218,10 +223,33 @@ describe("delete user", () => {
         })
     })
 })
-describe('Session Cookie', () => {
-    it('should set a session cookie', async () => {
-        const response = await request(app).get('/api/users/getall');
-        expect(response.statusCode).toBe(200);  
-
-    });
-});
+describe("user profile access", () => {
+    describe("user not authenticated", () => {
+        test('should respond with a message "Not Authenticated" and a 401 status code', async () => {
+            const response = await request(app).get("/api/users/auth/profile");
+            expect(response.statusCode).toBe(401)
+            expect(response.body).toEqual({ "message": "Not Authenticated" })
+        })
+    })
+    describe("user authenticated", () => {
+        test('should respond with a message "User Profile"', async () => {
+            const response = await agent.get("/api/users/auth/profile");
+            expect(response.body).toEqual({ "message": "User Profile" })
+        })
+    })
+})
+describe("User logout", () => {
+    describe("user not authenticated", () => {
+        test('should respond with a message "Not Authenticated" and a 401 status code', async () => {
+            const response = await request(app).post("/api/users/logout");
+            expect(response.statusCode).toBe(401)
+            expect(response.body).toEqual({ "message": "Not Authenticated" })
+        })
+    })
+    describe("user authenticated", () => {
+        test('should respond with a message "User Profile"', async () => {
+            const response = await agent.post("/api/users/logout");
+            expect(response.statusCode).toBe(200)
+        })
+    })
+})

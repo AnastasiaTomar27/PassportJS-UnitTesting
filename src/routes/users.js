@@ -66,6 +66,9 @@ router.get("/api/users/getbyid/:id", async (request, response) => {
 
 router.put("/api/users/update/:id", async (request, response) => {
     const id = request.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(400).json({ message: "Invalid ID format" });
+    }
     try {
         const user = await User.findByIdAndUpdate(id, request.body);
         if (!user) {

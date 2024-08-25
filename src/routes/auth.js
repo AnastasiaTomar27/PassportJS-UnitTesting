@@ -33,14 +33,12 @@ router.post(
     
 );
 
-router.get('/api/auth/status', isAuthenticated, (request, response) => {
-    console.log('Inside /auth/status endpoint');
-    console.log(request.user);
-    console.log(request.session);
-    return response.send(request.user) 
+router.get('/api/users/auth/profile', isAuthenticated, (request, response) => {
+    //return response.send(request.user)
+    return response.send({message: "User Profile"});
 });
 
-router.post('/api/auth/logout', isAuthenticated, (request, response) => {
+router.post('/api/users/logout', isAuthenticated, (request, response) => {
     request.logout((err) => {
         if (err) return response.sendStatus(400);
         response.sendStatus(200);
