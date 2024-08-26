@@ -1,9 +1,7 @@
 const app = require('../app');
 const request = require('supertest');
-const mongoose = require('mongoose');
 const User = require('../mongoose/schemas/user');
 const session = require('supertest-session');
-const { displayName } = require('../../jest.config');
 
 const user1 = {
     username: 'user123',
@@ -14,7 +12,6 @@ const user1 = {
 let userId;
 let agent;
 var testSession = null;
-let sessionCookie;
 
 beforeEach(async() => {
     await User.deleteMany({})
