@@ -37,14 +37,24 @@ describe("Session test", () => {
           .end(done)
       });
       
-      it('should sign in', function (done) {
-        testSession.post('/api/users/register')
-          .send({ username: 'foo', password: 'password', displayName: 'Foo' })
-          .expect(201)
-          .end(done);
-      });
-      
-});
+    it('should sign in', function (done) {
+    testSession.post('/api/users/register')
+        .send({ username: 'foo', password: 'password', displayName: 'Foo' })
+        .expect(201)
+        .end(done);
+    });
+    
+    test('cookies should be defined and contain user_sid', async () => {
+        const response = await request(app).post('/api/users/auth')
+        .send({
+            username: user1.username,
+            password: user1.password
+        });
+        const cookies = response.headers['set-cookie'];
+        expect(cookies).toBeDefined();
+        expect(cookies[0]).toMatch(/connect.sid/); 
+    })
+    })
 
 describe("Register user", () => {
     describe("sign up for a user with correct credentials", () => {
@@ -119,20 +129,7 @@ describe("Register user", () => {
         })
     })
 })
-describe("Authentication - Log in user", () => {
-    describe("Check that the cookie is set", () => {
-        test('cookies should be defined and contain user_sid', async () => {
-            const response = await request(app).post('/api/users/auth')
-            .send({
-                username: user1.username,
-                password: user1.password
-            });
-            const cookies = response.headers['set-cookie'];
-            expect(cookies).toBeDefined();
-            expect(cookies[0]).toMatch(/connect.sid/); 
-        })
-    })
-        
+describe("Authentication - Log in user", () => { 
     describe("Logging with valid credentials", () => {
         it('Should login for a user', async () => {
             const response = await request(app).post('/api/users/auth')
