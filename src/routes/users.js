@@ -2,7 +2,8 @@ const { Router } = require('express');
 const { validationResult, matchedData, body } = require('express-validator');
 const User = require('../mongoose/schemas/user');
 const { hashPassword } = require('../utils/helpers');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const isAuthenticated = require('../utils/isAuthenticatedMiddleware');
 
 const router = Router();
 
@@ -37,7 +38,7 @@ router.post(
     }
 );
 router.get(
-    "/api/users/getall", async (request, response) => {
+    "/api/users/getall", isAuthenticated, async (request, response) => {
         try {
             const data = await User.find();
             return response.json(data);

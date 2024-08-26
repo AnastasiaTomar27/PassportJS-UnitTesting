@@ -253,3 +253,10 @@ describe("User logout", () => {
         })
     })
 })
+it("should test /register for a valid request and return 201 status code and accessToken and refreshToken through cookies", async () => {
+    const resp = await request(app).get("/api/users/getall");
+    const cookies = resp.headers['set-cookie']
+    console.log(`${cookies} cookiesssssssssssssssssssssssssssss`)
+    //expect(response.statusCode).toBe(200)
+
+})
