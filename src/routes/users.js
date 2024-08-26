@@ -48,7 +48,7 @@ router.get(
         }
 });
 
-router.get("/api/users/getbyid/:id", async (request, response) => {
+router.get("/api/users/getbyid/:id", isAuthenticated, async (request, response) => {
     const id = request.params.id;
      // Check if the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -65,7 +65,7 @@ router.get("/api/users/getbyid/:id", async (request, response) => {
 
 });
 
-router.put("/api/users/update/:id", async (request, response) => {
+router.put("/api/users/update/:id", isAuthenticated, async (request, response) => {
     const id = request.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return response.status(400).json({ message: "Invalid ID format" });
@@ -89,7 +89,7 @@ router.put("/api/users/update/:id", async (request, response) => {
 //     return response.sendStatus(200);
 // });
 
-router.delete('/api/users/delete/:id', async (request, response) => {
+router.delete('/api/users/delete/:id', isAuthenticated, async (request, response) => {
     const id = request.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return response.status(400).json({ message: "Invalid ID format" });
