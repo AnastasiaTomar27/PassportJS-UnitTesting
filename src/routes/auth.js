@@ -29,16 +29,32 @@ router.post(
         } else {
             response.status(200).send({message: "Successfully authenticated!"});
         }
-    }
+        console.log(request.user)
+        console.log(request.session)
+
+        // console.log(request.session)
+        // console.log(request.session.id)
+
+    // request.sessionStore.get(request.session.id, (err, sessionData) => {
+    //     if (err) {
+    //         console.log(err);
+    //         throw err;
+    //     }
+    //     console.log(sessionData);
+    // })
+    })
+
     
-);
+
 
 router.get('/api/users/auth/profile', isAuthenticated, (request, response) => {
+    
+
     //return response.send(request.user)
     return response.send({message: "User Profile"});
 });
 
-router.post('/api/users/logout', isAuthenticated, (request, response) => {
+router.post('/api/users/auth/logout', isAuthenticated, (request, response) => {
     request.logout((err) => {
         if (err) return response.sendStatus(400);
         response.sendStatus(200);

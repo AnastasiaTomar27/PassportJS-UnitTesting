@@ -3,7 +3,6 @@ const { validationResult, matchedData, body } = require('express-validator');
 const User = require('../mongoose/schemas/user');
 const { hashPassword } = require('../utils/helpers');
 const mongoose = require('mongoose');
-const isAuthenticated = require('../utils/isAuthenticatedMiddleware');
 
 const router = Router();
 
@@ -38,7 +37,7 @@ router.post(
     }
 );
 router.get(
-    "/api/users/getall", isAuthenticated, async (request, response) => {
+    "/api/users/getall", async (request, response) => {
         try {
             const data = await User.find();
             return response.json(data);
@@ -48,7 +47,7 @@ router.get(
         }
 });
 
-router.get("/api/users/getbyid/:id", isAuthenticated, async (request, response) => {
+router.get("/api/users/getbyid/:id", async (request, response) => {
     const id = request.params.id;
      // Check if the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -65,7 +64,7 @@ router.get("/api/users/getbyid/:id", isAuthenticated, async (request, response) 
 
 });
 
-router.put("/api/users/update/:id", isAuthenticated, async (request, response) => {
+router.put("/api/users/update/:id", async (request, response) => {
     const id = request.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return response.status(400).json({ message: "Invalid ID format" });
@@ -89,7 +88,7 @@ router.put("/api/users/update/:id", isAuthenticated, async (request, response) =
 //     return response.sendStatus(200);
 // });
 
-router.delete('/api/users/delete/:id', isAuthenticated, async (request, response) => {
+router.delete('/api/users/delete/:id', async (request, response) => {
     const id = request.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return response.status(400).json({ message: "Invalid ID format" });

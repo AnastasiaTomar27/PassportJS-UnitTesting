@@ -15,11 +15,12 @@ app.use(express.json()); // we are telling Express to allow json data to be post
 app.use(cookieParser("session js learning")); // it makes the cookies easily readable from the request.cookies
 app.use(
     session({
+        name: "connect.sid",
         secret: "session js",
-        saveUninitialized: false,
-        resave: false,
+        saveUninitialized: false, // false means only when we modife session data ogbect, data will be stored to the session store 
+        resave: false, // false means it will not resave cookies every time, expired date wil stay the same
         cookie: {
-            maxAge: 60000 * 60
+            maxAge: 60000 * 60 // 60000 mlsec = 60 sec = 1 min, 60000 * 60 = 1 hour
         },
         store: MongoStore.create({
             client: mongoose.connection.getClient()

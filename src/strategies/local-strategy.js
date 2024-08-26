@@ -5,7 +5,6 @@ const { comparePassword } = require('../utils/helpers');
 
 passport.serializeUser((user, done) => { // to tell passport how to serialize user data into the session (it stores user ID to session data)
     console.log('Inside Serialize User');
-    console.log(user);
     done(null, user.id);
 })
 
@@ -13,7 +12,6 @@ passport.deserializeUser(async (id, done) => { // to take that ID and unpack, re
     console.log('Inside Deserializer');
     console.log(`Deserializing User ID: ${id}`);
     try {
-        //const findUser = mockUsers.find((user) => user.id === id);
         const findUser = await User.findById(id);
         if (!findUser) throw new Error("User Not Found");
         done(null, findUser);

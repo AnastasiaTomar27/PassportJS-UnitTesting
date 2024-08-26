@@ -2,6 +2,9 @@ const app = require('../app');
 const request = require('supertest');
 const mongoose = require('mongoose');
 const User = require('../mongoose/schemas/user');
+const session = require('supertest-session');
+const { displayName } = require('../../jest.config');
+
 const user1 = {
     username: 'user123',
     displayName: 'User123',
@@ -10,19 +13,39 @@ const user1 = {
 
 let userId;
 let agent;
+var testSession = null;
+let sessionCookie;
 
 beforeEach(async() => {
     await User.deleteMany({})
     const response = await request(app).post('/api/users/register').send(user1)
 
     userId = response.body._id;
-
     agent = request.agent(app);
+    testSession = session(app);
+
     await agent.post('/api/users/auth').send({
         username:user1.username,
         password: user1.password
     });
+    
 });
+describe("Session test", () => {
+    it('should fail accessing a restricted page', function (done) {
+        testSession.get('/api/users/auth/profile')
+          .expect(401)
+          .end(done)
+      });
+      
+      it('should sign in', function (done) {
+        testSession.post('/api/users/register')
+          .send({ username: 'foo', password: 'password', displayName: 'Foo' })
+          .expect(201)
+          .end(done);
+      });
+      
+});
+
 describe("Register user", () => {
     describe("sign up for a user with correct credentials", () => {
         test('should respond with a 201 status code and user details', async () => {
@@ -97,6 +120,19 @@ describe("Register user", () => {
     })
 })
 describe("Authentication - Log in user", () => {
+    describe("Check that the cookie is set", () => {
+        test('cookies should be defined and contain user_sid', async () => {
+            const response = await request(app).post('/api/users/auth')
+            .send({
+                username: user1.username,
+                password: user1.password
+            });
+            const cookies = response.headers['set-cookie'];
+            expect(cookies).toBeDefined();
+            expect(cookies[0]).toMatch(/connect.sid/); 
+        })
+    })
+        
     describe("Logging with valid credentials", () => {
         it('Should login for a user', async () => {
             const response = await request(app).post('/api/users/auth')
@@ -106,8 +142,9 @@ describe("Authentication - Log in user", () => {
             });
             expect(response.statusCode).toEqual(200);
             expect(response.body).toEqual({"message": "Successfully authenticated!"})
-        })
+        })      
     })
+   
     describe("Invalid username", () => {
         it('Should login for a user', async () => {
             const response = await request(app).post('/api/users/auth')
@@ -241,22 +278,16 @@ describe("user profile access", () => {
 describe("User logout", () => {
     describe("user not authenticated", () => {
         test('should respond with a message "Not Authenticated" and a 401 status code', async () => {
-            const response = await request(app).post("/api/users/logout");
+            const response = await request(app).post("/api/users/auth/logout");
             expect(response.statusCode).toBe(401)
             expect(response.body).toEqual({ "message": "Not Authenticated" })
         })
     })
     describe("user authenticated", () => {
         test('should respond with a message "User Profile"', async () => {
-            const response = await agent.post("/api/users/logout");
+            const response = await agent.post("/api/users/auth/logout");
             expect(response.statusCode).toBe(200)
         })
     })
 })
-it("should test /register for a valid request and return 201 status code and accessToken and refreshToken through cookies", async () => {
-    const resp = await request(app).get("/api/users/getall");
-    const cookies = resp.headers['set-cookie']
-    console.log(`${cookies} cookiesssssssssssssssssssssssssssss`)
-    //expect(response.statusCode).toBe(200)
 
-})
