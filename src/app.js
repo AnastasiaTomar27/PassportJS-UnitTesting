@@ -1,13 +1,15 @@
+require('module-alias/register')
 const path = require('path')
 require('dotenv').config({path: path.resolve('config/dev.env')})
 const mongoose = require('mongoose');
-require('./mongoose/connection')
+require('@mongooseConnection')
 const express = require('express');
-const rootRouter = require('./routes/root');
+const rootRouter = require('@root');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
 const MongoStore = require('connect-mongo')
+
 
 app = express();   
 

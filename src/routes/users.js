@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { validationResult, matchedData, body } = require('express-validator');
-const User = require('../mongoose/schemas/user');
-const { hashPassword } = require('../utils/helpers');
+const User = require('@user');
+const { hashPassword } = require('@helpers');
 const mongoose = require('mongoose');
 
 const router = Router();

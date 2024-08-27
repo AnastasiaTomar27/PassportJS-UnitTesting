@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { validationResult, body } = require('express-validator');
-const passport = require('../strategies/local-strategy');
-const isAuthenticated = require('../utils/isAuthenticatedMiddleware');
+const passport = require('@local-strategy');
+const isAuthenticated = require('@isAuthenticated');
 
 const router = Router();
 

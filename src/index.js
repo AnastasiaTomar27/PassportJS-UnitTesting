@@ -15,20 +15,3 @@ app.get("/", (request, response) => {
 
 module.exports = app;
 
-// "_moduleAliases": {
-//     "@approot": ".",
-//     "@constants": "src/utils/constants.js",
-//     "@authSchemas": "src/utils/authSchemas.js",
-//     "@local-strategy": "src/strategies/local-strategy.js",
-//     "@root": "src/routes/root.js",
-//     "@users": "src/routes/users.js",
-//     "@cart": "src/routes/cart.js",
-//     "@products": "src/routes/products.js",
-//     "@auth": "src/routes/auth.js",
-//     "@cartValidationSchemas": "src/utils/cartValidationSchemas.js",
-//     "@validationSchemas": "src/utils/validationSchemas.js"    
-//   },
-//   "_moduleDirectories": [
-//     "src",
-//     "src/utils"
-//   ],

@@ -1,7 +1,7 @@
 const passport = require('passport');
 const { Strategy } = require('passport-local');
-const  User  = require('../mongoose/schemas/user');
-const { comparePassword } = require('../utils/helpers');
+const  User  = require('@user');
+const { comparePassword } = require('@helpers');
 
 passport.serializeUser((user, done) => { // to tell passport how to serialize user data into the session (it stores user ID to session data)
     console.log('Inside Serialize User');
