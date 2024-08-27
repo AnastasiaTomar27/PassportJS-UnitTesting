@@ -66,6 +66,18 @@ describe("Register user", () => {
             expect(response.body).toMatchObject[{username: 'olga', displayName: 'Olga', password: 'hello123' }]
         })
     })
+    describe("user already exists", () => {
+        test('should respond with a 201 status code and user details', async () => {
+            const response = await request(app).post('/api/users/register')
+            .send({
+                username: user1.username,
+                displayName: user1.displayName,
+                password: user1.password
+            })
+            expect(response.statusCode).toBe(400)
+            expect(response.body).toEqual({"message": "User already registered!"});
+        })
+    })
     describe('username length is more than 20 characters', () => {
         test("should respond with a 400 status code and error message ", async () => {
             const response = await request(app).post("/api/users/register").send({

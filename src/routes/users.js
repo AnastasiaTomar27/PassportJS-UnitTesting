@@ -28,6 +28,10 @@ router.post(
         data.password = hashPassword(data.password);
         const newUser = new User(data);
         try {
+            const userAvailable = await User.findOne({username: data.username});
+            if (userAvailable) {
+                response.status(400).json({message: "User already registered!"});
+            }
             const savedUser = await newUser.save();
             return response.status(201).send(savedUser);
         } catch (err) {
