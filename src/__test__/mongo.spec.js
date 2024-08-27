@@ -41,7 +41,7 @@ describe("Session test", () => {
         .end(done);
     });
     
-    test('cookies should be defined and contain user_sid', async () => {
+    test('cookies should be defined and contain connect.sid', async () => {
         const response = await request(app).post('/api/users/auth')
         .send({
             username: user1.username,
