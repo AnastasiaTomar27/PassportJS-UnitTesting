@@ -21,8 +21,8 @@ router.post(
             return response.status(400).send({ errors: result.array() });
         }
         
-        passport.authenticate("local", (err, user) => {
-            console.log("err, user, info", err, user);
+        passport.authenticate("local", (err, user, info) => {
+            console.log("err, user, info", err, user, info);
 
             // I don't need it, because I want to logIn user, so that I attach it to request and to the session
             // if (err) {
@@ -65,7 +65,10 @@ router.get('/api/users/auth/profile', isAuthenticated, (request, response) => {
 router.post('/api/users/auth/logout', isAuthenticated, (request, response) => {
     request.logout((err) => {
         if (err) return response.sendStatus(400);
-        response.sendStatus(200);
+        request.session.destroy(($err) => {
+            if ($err) return response.sendStatus(400);
+            response.sendStatus(200);
+        })
     });
 });
 
