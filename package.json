@@ -22,7 +22,7 @@
     "@isAuthenticated": "src/utils/isAuthenticatedMiddleware.js",
     "@mongooseConnection": "src/mongoose/connection.js",
     "@user": "src/mongoose/schemas/user.js",
-    "@helpers": "src/utils/helpers"    
+    "@helpers": "src/utils/helpers"
   },
   "_moduleDirectories": [
     "src",
@@ -42,6 +42,7 @@
     "express-validator": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
+    "module-alias-jest": "^0.0.3",
     "mongoose": "^8.5.3",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0"

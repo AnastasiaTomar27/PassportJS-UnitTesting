@@ -20,32 +20,40 @@ router.post(
         if (!result.isEmpty()) {
             return response.status(400).send({ errors: result.array() });
         }
-        next();
-    },
-   passport.authenticate("local"), 
-    (request, response) => {
-        if (!request.user) {
-            response.status(401).send({ message: "Access Denied" }) // it will never happen because in passport it throws error, right?
-        } else {
-            response.status(200).send({message: "Successfully authenticated!"});
-        }
-        console.log(request.user)
-        console.log(request.session)
+        
+        passport.authenticate("local", (err, user) => {
+            console.log("err, user, info", err, user);
 
-        // console.log(request.session)
-        // console.log(request.session.id)
+            // I don't need it, because I want to logIn user, so that I attach it to request and to the session
+            // if (err) {
+            //     console.log("errorrr")
+            //     return response.json({err});
+            // }
+            // if (!user) {
+            //     return response.json({ message: 'Access denied' });
+            // }
 
-    // request.sessionStore.get(request.session.id, (err, sessionData) => {
-    //     if (err) {
-    //         console.log(err);
-    //         throw err;
-    //     }
-    //     console.log(sessionData);
-    // })
-    })
-
-    
-
+            request.logIn(user, async (err) => {
+                if (!request.user) {
+                    response.status(401).send({ message: "Access Denied" }) 
+                } else {
+                    response.status(200).send({message: "Successfully authenticated!"});
+                }
+                
+                console.log(request.user)
+                console.log(request.session)
+                
+                request.sessionStore.get(request.session.id, (err, sessionData) => {
+                    if (err) {
+                        console.log(err);
+                        throw err;
+                    }
+                    console.log(sessionData);
+                })
+            })
+        })(request, response, next); // passing the arguments to `passport.authenticate`
+    }
+)
 
 router.get('/api/users/auth/profile', isAuthenticated, (request, response) => {
     
