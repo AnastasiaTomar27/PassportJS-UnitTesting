@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { validationResult, matchedData, body } = require('express-validator');
 const User = require('@user');
-const { hashPassword } = require('@helpers');
+//const { hashPassword } = require('@helpers');
 const mongoose = require('mongoose');
 
 const router = Router();
@@ -21,11 +21,9 @@ router.post(
 
         if (!result.isEmpty()) {
             return response.status(400).send({ errors: result.array() });
-        }
-            
+        }     
 
         const data = matchedData(request);
-        data.password = hashPassword(data.password);
         const newUser = new User(data);
         try {
             const userAvailable = await User.findOne({username: data.username});
@@ -102,7 +100,7 @@ router.delete('/api/users/delete/:id', async (request, response) => {
         if (!user) {
             return response.status(404).json({message: `Cannot find any user with ID ${id}` })
         }
-        await User.findByIdAndDelete(id);
+        await User.findByIdAndUpdate(id, {...user._doc, deletedAt: new Date() });
         response.status(201).json({message: "User deleted successfully"});
     } catch(err) {
         console.log(err);
@@ -111,3 +109,7 @@ router.delete('/api/users/delete/:id', async (request, response) => {
 });
 
 module.exports = router;
+
+
+
+// 
