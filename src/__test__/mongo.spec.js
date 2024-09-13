@@ -18,10 +18,19 @@ const user1 = {
     displayName: 'User123',
     password: 'hello123'
 }
+const user2 = {
+    username: 'user456',
+    displayName: 'User456',
+    password: 'hello456'
+}
 
 let userId;
 let agent;
 var testSession = null;
+
+let secondUserId;
+let secondAgent;
+var secondTestSession = null;
 
 beforeEach(async () => {
     await User.deleteMany({});
@@ -109,6 +118,24 @@ describe("Register user", () => {
             expect(response.body.errors[0]).toEqual({
                 type: 'field',
                 value: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+                msg: 'Username must be maximum of 20 characters.',
+                path: 'username',
+                location: 'body'
+              });
+    
+        })
+        test("adding very long username should respond with a 400 status code and error message", async () => {
+            const response = await request(app).post("/api/users/register").send({
+                username: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                displayName: "Anastasia",
+                password: "hello123"
+            });
+            expect(response.statusCode).toBe(400);
+            expect(response.body.errors).not.toBeNull();
+            expect(response.body.errors.length).toBe(1);
+            expect(response.body.errors[0]).toEqual({
+                type: 'field',
+                value: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
                 msg: 'Username must be maximum of 20 characters.',
                 path: 'username',
                 location: 'body'
@@ -226,14 +253,15 @@ describe("get user by ID", () => {
         })
     })
     describe("user ID doesn't exist", () => {
-        test('should respond with a 400 status because user with this ID does not exist', async () => {
-            const userID = '66ca4374df0a99a8061807';
+        test('should respond with a 404 status because user with this ID does not exist', async () => {
+            const userID = '507f1f77bcf86cd799439011';
             const response = await request(app).get(`/api/users/getbyid/${userID}`);
-            expect(response.statusCode).toBe(400);
+            expect(response.body).toEqual({ "message": `Cannot find any user with ID ${userID}` })
+            expect(response.statusCode).toBe(404);
         })
     })
     describe("user ID is invalid", () => {
-        test('should respond with a 400 status because user with this ID does not exist', async () => {
+        test('should respond with a 400 status because user ID is invalid, it is a string', async () => {
             const userID = '66ca437';
             const response = await request(app).get(`/api/users/getbyid/${userID}`);
             expect(response.statusCode).toBe(400);
@@ -243,14 +271,14 @@ describe("get user by ID", () => {
 })
 describe("update user", () => {
     describe("should update user by ID", () => {
-        test('should respond with a 400 status because ID is a string', async () => {
+        test('should respond with a 201 status and update user', async () => {
             const response = await request(app).put(`/api/users/update/${userId}`)
             .send({
                 username: "ilona",
                 displayName: "Ilona",
                 password: "Ilona"
             });
-            expect(response.statusCode).toBe(200)
+            expect(response.statusCode).toBe(201)
             expect(response.body).toMatchObject[{username: 'ilona', displayName: 'Ilona', password: 'Ilona' }]
 
         })
@@ -262,6 +290,11 @@ describe("delete user", () => {
             const response = await request(app).delete(`/api/users/delete/${userId}`)
             expect(response.statusCode).toBe(200)
             expect(response.body).toEqual({ "message": "User deleted successfully" })
+
+            // checking whether  user that was soft deleted marked in the database as deletedAt
+            const deletedUser = await User.findById(userId);
+            expect(deletedUser).not.toBeNull();
+            expect(deletedUser.deletedAt).toBeDefined();
         })
     })
     describe("user doesn't exist", () => {
@@ -315,5 +348,31 @@ describe("User logout", () => {
 
         })
     })
+    
+})
+describe("Switching sessions", () => {
+    describe("one user logout and another user log in", () => {
+        test('should respond with a message "User Profile" and a 200 status code', async () => {
+            // Log out as the first user
+            await agent.post("/api/users/auth/logout");
+            
+            // Register second user
+            const response2 = await request(app).post('/api/users/register').send(user2);
+            secondAgent = request.agent(app);
+
+            // Authenticate the second user
+            await secondAgent.post('/api/users/auth').send({
+                username: user2.username,
+                password: user2.password
+            });
+
+            // Verify second user session
+            const profileResponse = await secondAgent.get("/api/users/auth/profile");
+            expect(profileResponse.statusCode).toBe(200);
+            expect(profileResponse.body).toEqual({ "message": "User Profile" });
+
+        })
+    })
+    
 })
 
