@@ -80,7 +80,7 @@ router.put("/api/users/update/:id", async (request, response) => {
             return response.status(404).json({message: `Cannot find any user with ID ${id}` })
         }
         const updatedUser = await User.findById(id);
-        response.status(200).json(updatedUser);
+        response.status(201).json(updatedUser);
     } catch(err) {
         console.log(err);
         return response.status(400);
