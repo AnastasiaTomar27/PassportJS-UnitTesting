@@ -28,7 +28,7 @@ router.post(
         try {
             const userAvailable = await User.findOne({username: data.username});
             if (userAvailable) {
-                response.status(400).json({message: "User already registered!"});
+                return response.status(400).json({message: "User already registered!"});
             }
             const savedUser = await newUser.save();
             return response.status(201).send(savedUser);
@@ -45,7 +45,7 @@ router.get(
             return response.json(data);
         } catch(err) {
             console.log(err);
-            return response.status(400).response.json(data);
+            return response.status(400).json(data);
         }
 });
 
@@ -58,6 +58,9 @@ router.get("/api/users/getbyid/:id", async (request, response) => {
 
     try {
         const user = await User.findById(id);
+        if (!user) {
+            return response.status(404).json({message: `Cannot find any user with ID ${id}`});
+        }
         return response.status(200).send(user);
     } catch(err) {
         console.log(err);
@@ -72,7 +75,7 @@ router.put("/api/users/update/:id", async (request, response) => {
         return response.status(400).json({ message: "Invalid ID format" });
     }
     try {
-        const user = await User.findByIdAndUpdate(id, request.body);
+        const user = await User.findByIdAndUpdate(id, request.body, { new: true });
         if (!user) {
             return response.status(404).json({message: `Cannot find any user with ID ${id}` })
         }
@@ -101,7 +104,7 @@ router.delete('/api/users/delete/:id', async (request, response) => {
             return response.status(404).json({message: `Cannot find any user with ID ${id}` })
         }
         await User.findByIdAndUpdate(id, {...user._doc, deletedAt: new Date() });
-        response.status(201).json({message: "User deleted successfully"});
+        response.status(200).json({message: "User deleted successfully"});
     } catch(err) {
         console.log(err);
         return response.status(400);
@@ -112,4 +115,3 @@ module.exports = router;
 
 
 
-// 
