@@ -3,7 +3,7 @@ const path = require('path')
 require('dotenv').config({path: path.resolve('config/dev.env')})
 const mongoose = require('mongoose');
 require('@mongooseConnection')
-const { connectDB } = require('./mongoose/connection')
+//const { connectDB } = require('./mongoose/connection')
 const express = require('express');
 const rootRouter = require('@root');
 const cookieParser = require('cookie-parser');
@@ -15,11 +15,11 @@ const MongoStore = require('connect-mongo')
 app = express();  
 
 //Define the MongoDB URI based on the environment
-const mongoUri = process.env.NODE_ENV === 'test'
-  ? 'mongodb://localhost:27017/test' // Replace with actual test URI if needed
-  : process.env.MONGODB_URL;
+// const mongoUri = process.env.NODE_ENV === 'test'
+//   ? 'mongodb://localhost:27017/test' // Replace with actual test URI if needed
+//   : process.env.MONGODB_URL;
 
-connectDB();
+// connectDB();
 
 app.use(express.json()); // we are telling Express to allow json data to be posted to the server
 app.use(cookieParser("session js learning")); // it makes the cookies easily readable from the request.cookies
@@ -33,8 +33,8 @@ app.use(
             maxAge: 60000 * 60 // 60000 mlsec = 60 sec = 1 min, 60000 * 60 = 1 hour
         },
         store: MongoStore.create({
-            //client: mongoose.connection.getClient()
-            mongoUrl:mongoUri
+            client: mongoose.connection.getClient()
+            //mongoUrl:mongoUri
     })
     })
 );

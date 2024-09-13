@@ -22,7 +22,7 @@ router.post(
         }
         
         passport.authenticate("local", (err, user, info) => {
-            console.log("err, user, info", err, user, info);
+            //console.log("err, user, info", err, user, info);
 
             // I don't need it, because I want to logIn user, so that I attach it to request and to the session
             // if (err) {
@@ -40,15 +40,15 @@ router.post(
                     response.status(200).send({message: "Successfully authenticated!"});
                 }
                 
-                console.log(request.user)
-                console.log(request.session)
+                // console.log(request.user)
+                // console.log(request.session)
                 
                 request.sessionStore.get(request.session.id, (err, sessionData) => {
                     if (err) {
                         console.log(err);
                         throw err;
                     }
-                    console.log(sessionData);
+                    //console.log(sessionData);
                 })
             })
         })(request, response, next); // passing the arguments to `passport.authenticate`
@@ -64,10 +64,10 @@ router.get('/api/users/auth/profile', isAuthenticated, (request, response) => {
 
 router.post('/api/users/auth/logout', isAuthenticated, (request, response) => {
     request.logout((err) => {
-        if (err) return response.sendStatus(400);
+        if (err) return response.status(400).json({message: "Logout failed"});
         request.session.destroy(($err) => {
-            if ($err) return response.sendStatus(400);
-            response.sendStatus(200);
+            if ($err) return response.status(400).json({message: "Failed to destroy session"});
+            response.status(200).json({message: "Successfully logged out"});
         })
     });
 });
