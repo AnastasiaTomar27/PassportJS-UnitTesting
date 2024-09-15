@@ -9,10 +9,12 @@ router.post(
     '/api/users/auth', 
     [
         body("username").notEmpty().isLength({ max: 20 }).withMessage('Username must be maximum of 20 characters.').isString(),
-        // body("password").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString().custom(async value => {
-        //     if (!("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]){8,}$").test(value)) { throw new Error(); }
-        // }).withMessage("User password configuration is invalid")
-        body("password").notEmpty().isLength({ max: 20 }).withMessage('Username must be maximum of 20 characters.').isString()
+        body("password").notEmpty().isLength({ max: 20 }).withMessage('Password must be maximum of 20 characters.').isString()
+        .custom(async (value) => {
+            const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])/;
+            if (!passwordRegex.test(value)) {
+                throw new Error(); }
+            }).withMessage("User password configuration is invalid")
     ],
     async (request, response, next) => {
         const result = validationResult(request);
@@ -56,10 +58,7 @@ router.post(
 )
 
 router.get('/api/users/auth/profile', isAuthenticated, (request, response) => {
-    
-
-    //return response.send(request.user)
-    return response.send({message: "User Profile"});
+        return response.send({message: "User Profile"});
 });
 
 router.post('/api/users/auth/logout', isAuthenticated, (request, response) => {
