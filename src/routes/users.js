@@ -88,12 +88,6 @@ router.put("/api/users/update/:id", async (request, response) => {
     }
 });
 
-// router.patch('/api/users/:id', (request, response) => {
-//     const { body, findUserIndex } = request;
-//     mockUsers[findUserIndex] = { ...mockUsers[findUserIndex], ...body };
-//     return response.sendStatus(200);
-// });
-
 router.delete('/api/users/delete/:id', async (request, response) => {
     const id = request.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
