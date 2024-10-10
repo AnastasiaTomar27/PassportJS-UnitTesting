@@ -27,13 +27,13 @@ router.post(
             console.log("err, user, info", err, user, info);
 
             //I don't need it, because I want to log In user, so that I attach it to request and to the session
-            if (err) {
-                console.log("errorrr")
-                return response.json({err});
-            }
-            if (!user) {
-                return response.json({ message: 'Access denied' });
-            }
+            // if (err) {
+            //     console.log("errorrr")
+            //     return response.json({err});
+            // }
+            // if (!user) {
+            //     return response.json({ message: 'Access denied' });
+            // }
 
             request.logIn(user, async (err) => {
                 if (!request.user) {
