@@ -2,34 +2,39 @@ const app = require('../app');
 const request = require('supertest');
 const User = require('../mongoose/schemas/user');
 const session = require('supertest-session');
-//const { connectDB, disconnectDB } = require('../mongoose/connection');
+const { disconnectDB } = require('../mongoose/connection');
 
 // beforeAll (async() => {
 //     await connectDB();
 //     console.log("Connected to in-memory MongoDB");
 // });
-// afterAll (async() => {
-//     await disconnectDB();
-//     console.log("Disconnected from in-memory MongoDB");
-// });
+afterAll (async() => {
+    await disconnectDB();
+    console.log("Disconnected from in-memory MongoDB");
+});
 
 const user1 = {
     username: 'user123',
     displayName: 'User123',
-    password: 'hello123'
+    password: 'Hello123'
+}
+const user2 = {
+    username: 'user456',
+    displayName: 'User456',
+    password: 'Hello456'
 }
 
 let userId;
 let agent;
 var testSession = null;
 
+let secondAgent;
+
 beforeEach(async () => {
     await User.deleteMany({});
-    //await mongoose.connection.db.dropDatabase(); // Ensure the database is clean before each test
 
     const response = await request(app).post('/api/users/register').send(user1)
-    // const user = new User({user1});
-    // user.save();
+    
 
     userId = response.body._id;
     agent = request.agent(app);
@@ -42,9 +47,6 @@ beforeEach(async () => {
 });
 
 
-
-
-
 describe("Session test", () => {
     it('should fail accessing a restricted page', function (done) {
         testSession.get('/api/users/auth/profile')
@@ -54,7 +56,7 @@ describe("Session test", () => {
       
     it('should sign in', function (done) {
     testSession.post('/api/users/register')
-        .send({ username: 'foo', password: 'password', displayName: 'Foo' })
+        .send({ username: 'foo', password: 'Password1', displayName: 'Foo' })
         .expect(201)
         .end(done);
     });
@@ -78,10 +80,10 @@ describe("Register user", () => {
             .send({
                 username: 'olga',
                 displayName: 'Olga',
-                password: 'hello123'
+                password: 'Hello123'
             })
             expect(response.statusCode).toBe(201)
-            expect(response.body).toMatchObject[{username: 'olga', displayName: 'Olga', password: 'hello123' }]
+            expect(response.body).toMatchObject[{username: 'olga', displayName: 'Olga', password: 'Hello123' }]
         })
     })
     describe("user already exists", () => {
@@ -101,7 +103,7 @@ describe("Register user", () => {
             const response = await request(app).post("/api/users/register").send({
                 username: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 displayName: "Anastasia",
-                password: "hello123"
+                password: "Hello123"
             });
             expect(response.statusCode).toBe(400);
             expect(response.body.errors).not.toBeNull();
@@ -115,13 +117,87 @@ describe("Register user", () => {
               });
     
         })
+        test("adding very long username should respond with a 400 status code and error message", async () => {
+            const response = await request(app).post("/api/users/register").send({
+                username: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                displayName: "Anastasia",
+                password: "Hello123"
+            });
+            expect(response.statusCode).toBe(400);
+            expect(response.body.errors).not.toBeNull();
+            expect(response.body.errors.length).toBe(1);
+            expect(response.body.errors[0]).toEqual({
+                type: 'field',
+                value: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+                msg: 'Username must be maximum of 20 characters.',
+                path: 'username',
+                location: 'body'
+              });
+        })
+        it("should fail if password does not meet the criteria (missing uppercase)", async () => {
+            const response = await request(app)
+              .post("/api/users/register")
+              .send({
+                username: "testUser",
+                displayName: "testDisplayName",
+                password: "password123", // No uppercase
+              });
+        
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  msg: "User password configuration is invalid",
+                }),
+              ])
+            );
+        });
+        it("should fail if password does not meet the criteria (missing lowercase)", async () => {
+            const response = await request(app)
+              .post("/api/users/register")
+              .send({
+                username: "testUser",
+                displayName: "testDisplayName",
+                password: "PASSWORD123", // No lowercase
+              });
+        
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  msg: "User password configuration is invalid",
+                }),
+              ])
+            );
+          });
+        
+          it("should fail if password does not meet the criteria (missing number)", async () => {
+            const response = await request(app)
+              .post("/api/users/register")
+              .send({
+                username: "testUser",
+                displayName: "testDisplayName",
+                password: "Password", // No number
+              });
+        
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  msg: "User password configuration is invalid",
+                }),
+              ])
+            );
+          });
+        
+
     })
     describe('displayname length is more than 20 characters', () => {
         test("should respond with a 400 status code and error message", async () => {
             const response = await request(app).post("/api/users/register").send({
                 username: "anastasia",
                 displayName: "Anastasiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                password: "hello123"
+                password: "Hello123"
             });
             expect(response.statusCode).toBe(400);
             expect(response.body.errors).not.toBeNull();
@@ -141,14 +217,14 @@ describe("Register user", () => {
             const response = await request(app).post("/api/users/register").send({
                 username: "anastasia",
                 displayName: "Anastasia",
-                password: "hello123333333333333333333333333333333333333333333"
+                password: "Hello123333333333333333333333333333333333333333333"
             });
             expect(response.statusCode).toBe(400);
             expect(response.body.errors).not.toBeNull();
             expect(response.body.errors.length).toBe(1);
             expect(response.body.errors[0]).toEqual({
                 type: 'field',
-                value: 'hello123333333333333333333333333333333333333333333',
+                value: 'Hello123333333333333333333333333333333333333333333',
                 msg: 'Password must be maximum of 20 characters.',
                 path: 'password',
                 location: 'body'
@@ -170,11 +246,11 @@ describe("Authentication - Log in user", () => {
     })
    
     describe("Invalid username", () => {
-        it('Should login for a user', async () => {
+        it('Should fail because username length is more than 20 characters', async () => {
             const response = await request(app).post('/api/users/auth')
             .send({
                 username: "Markussssssssssssssssssssssssssssssssssssssssssssssssss",
-                password: "hello123"
+                password: "Hello123"
             });
             expect(response.statusCode).toEqual(400);
             expect(response.body.errors).not.toBeNull();
@@ -188,24 +264,77 @@ describe("Authentication - Log in user", () => {
               });
         })
     })
-    describe("Invalid username", () => {
-        it('Should login for a user', async () => {
+    describe("Invalid password", () => {
+        it('Should fail because password length is more than 20 characters', async () => {
             const response = await request(app).post('/api/users/auth')
             .send({
                 username: "Markus",
-                password: "hello1233333333333333333333333333333333333333333333333"
+                password: "Hello1233333333333333333333333333333333333333333333333"
             });
             expect(response.statusCode).toEqual(400);
             expect(response.body.errors).not.toBeNull();
             expect(response.body.errors.length).toBe(1);
             expect(response.body.errors[0]).toEqual({
                 type: "field",
-                value: "hello1233333333333333333333333333333333333333333333333",
-                msg: "Username must be maximum of 20 characters.",
+                value: "Hello1233333333333333333333333333333333333333333333333",
+                msg: "Password must be maximum of 20 characters.",
                 path: "password",
                 location: "body"
               });
         })
+        it('should fail if password does not meet the criteria (missing uppercase)', async () => {
+            const response = await request(app)
+              .post('/api/users/auth')
+              .send({
+                username: 'testUser',
+                password: 'password123', // No uppercase
+              });
+        
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  msg: 'User password configuration is invalid',
+                }),
+              ])
+            );
+          });
+        
+          it('should fail if password does not meet the criteria (missing lowercase)', async () => {
+            const response = await request(app)
+              .post('/api/users/auth')
+              .send({
+                username: 'testUser',
+                password: 'PASSWORD123', // No lowercase
+              });
+        
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  msg: 'User password configuration is invalid',
+                }),
+              ])
+            );
+          });
+        
+          it('should fail if password does not meet the criteria (missing number)', async () => {
+            const response = await request(app)
+              .post('/api/users/auth')
+              .send({
+                username: 'testUser',
+                password: 'Password', // No number
+              });
+        
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  msg: 'User password configuration is invalid',
+                }),
+              ])
+            );
+          });
     })
 
     
@@ -226,14 +355,15 @@ describe("get user by ID", () => {
         })
     })
     describe("user ID doesn't exist", () => {
-        test('should respond with a 400 status because user with this ID does not exist', async () => {
-            const userID = '66ca4374df0a99a8061807';
+        test('should respond with a 404 status because user with this ID does not exist', async () => {
+            const userID = '507f1f77bcf86cd799439011';
             const response = await request(app).get(`/api/users/getbyid/${userID}`);
-            expect(response.statusCode).toBe(400);
+            expect(response.body).toEqual({ "message": `Cannot find any user with ID ${userID}` })
+            expect(response.statusCode).toBe(404);
         })
     })
     describe("user ID is invalid", () => {
-        test('should respond with a 400 status because user with this ID does not exist', async () => {
+        test('should respond with a 400 status because user ID is invalid, it is a string', async () => {
             const userID = '66ca437';
             const response = await request(app).get(`/api/users/getbyid/${userID}`);
             expect(response.statusCode).toBe(400);
@@ -243,15 +373,15 @@ describe("get user by ID", () => {
 })
 describe("update user", () => {
     describe("should update user by ID", () => {
-        test('should respond with a 400 status because ID is a string', async () => {
+        test('should respond with a 201 status and update user', async () => {
             const response = await request(app).put(`/api/users/update/${userId}`)
             .send({
                 username: "ilona",
                 displayName: "Ilona",
-                password: "Ilona"
+                password: "Ilona1"
             });
-            expect(response.statusCode).toBe(200)
-            expect(response.body).toMatchObject[{username: 'ilona', displayName: 'Ilona', password: 'Ilona' }]
+            expect(response.statusCode).toBe(201)
+            expect(response.body).toMatchObject[{username: 'ilona', displayName: 'Ilona', password: 'Ilona1' }]
 
         })
     })
@@ -262,6 +392,11 @@ describe("delete user", () => {
             const response = await request(app).delete(`/api/users/delete/${userId}`)
             expect(response.statusCode).toBe(200)
             expect(response.body).toEqual({ "message": "User deleted successfully" })
+
+            // checking whether  user that was soft deleted marked in the database as deletedAt
+            const deletedUser = await User.findById(userId);
+            expect(deletedUser).not.toBeNull();
+            expect(deletedUser.deletedAt).toBeDefined();
         })
     })
     describe("user doesn't exist", () => {
@@ -315,5 +450,31 @@ describe("User logout", () => {
 
         })
     })
+    
+})
+describe("Switching sessions", () => {
+    describe("one user logout and another user log in", () => {
+        test('should respond with a message "User Profile" and a 200 status code', async () => {
+            // Log out as the first user
+            await agent.post("/api/users/auth/logout");
+            
+            // Register second user
+            const response2 = await request(app).post('/api/users/register').send(user2);
+            secondAgent = request.agent(app);
+
+            // Authenticate the second user
+            await secondAgent.post('/api/users/auth').send({
+                username: user2.username,
+                password: user2.password
+            });
+
+            // Verify second user session
+            const profileResponse = await secondAgent.get("/api/users/auth/profile");
+            expect(profileResponse.statusCode).toBe(200);
+            expect(profileResponse.body).toEqual({ "message": "User Profile" });
+
+        })
+    })
+    
 })
 

@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const { validationResult, matchedData, body } = require('express-validator');
 const User = require('@user');
-//const { hashPassword } = require('@helpers');
 const mongoose = require('mongoose');
 
 const router = Router();
@@ -11,10 +10,12 @@ router.post(
     [
     body("username").notEmpty().isLength({ max: 20 }).withMessage('Username must be maximum of 20 characters.').isString(),
     body("displayName").notEmpty().isLength({ max: 20 }).withMessage('Displayname must be maximum of 20 characters.').isString(),
-    // body("password").notEmpty().isLength({ max: 100 }).withMessage('Username must be maximum of 100 characters.').isString().custom(async value => {
-    //     if (!("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]){8,}$").test(value)) { throw new Error(); }
-    // }).withMessage("User password configuration is invalid")
     body("password").notEmpty().isLength({ max: 20 }).withMessage('Password must be maximum of 20 characters.').isString()
+        .custom(async (value) => {
+            const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])/;
+            if (!passwordRegex.test(value)) {
+                throw new Error(); }
+            }).withMessage("User password configuration is invalid")  
     ],
     async (request, response) => {
         const result = validationResult(request);
@@ -45,7 +46,7 @@ router.get(
             return response.json(data);
         } catch(err) {
             console.log(err);
-            return response.status(400).json(data);
+            return response.status(400).json({ message: 'Error retrieving users', error: err.message });
         }
 });
 
@@ -80,18 +81,12 @@ router.put("/api/users/update/:id", async (request, response) => {
             return response.status(404).json({message: `Cannot find any user with ID ${id}` })
         }
         const updatedUser = await User.findById(id);
-        response.status(200).json(updatedUser);
+        response.status(201).json(updatedUser);
     } catch(err) {
         console.log(err);
         return response.status(400);
     }
 });
-
-// router.patch('/api/users/:id', (request, response) => {
-//     const { body, findUserIndex } = request;
-//     mockUsers[findUserIndex] = { ...mockUsers[findUserIndex], ...body };
-//     return response.sendStatus(200);
-// });
 
 router.delete('/api/users/delete/:id', async (request, response) => {
     const id = request.params.id;
