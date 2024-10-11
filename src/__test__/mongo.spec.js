@@ -35,7 +35,6 @@ beforeEach(async () => {
 
     const response = await request(app).post('/api/users/register').send(user1)
     
-
     userId = response.body._id;
     agent = request.agent(app);
     testSession = session(app);
@@ -450,28 +449,36 @@ describe("User logout", () => {
 
         })
     })
-    
+    afterEach(async () => {
+      // Log out 
+      await agent.post("/api/users/auth/logout");
+    })
 })
 describe("Switching sessions", () => {
     describe("one user logout and another user log in", () => {
         test('should respond with a message "User Profile" and a 200 status code', async () => {
-            // Log out as the first user
-            await agent.post("/api/users/auth/logout");
-            
-            // Register second user
-            const response2 = await request(app).post('/api/users/register').send(user2);
-            secondAgent = request.agent(app);
+          // log in as a first user
+          await agent.post('/api/users/auth').send({
+            username:user1.username,
+            password: user1.password
+        });   
+          // log out as a first user
+          await agent.post("/api/users/auth/logout");
+          
+          // Register second user
+          const response2 = await request(app).post('/api/users/register').send(user2);
+          secondAgent = request.agent(app);
 
-            // Authenticate the second user
-            await secondAgent.post('/api/users/auth').send({
-                username: user2.username,
-                password: user2.password
-            });
+          // Authenticate the second user
+          await secondAgent.post('/api/users/auth').send({
+              username: user2.username,
+              password: user2.password
+          });
 
-            // Verify second user session
-            const profileResponse = await secondAgent.get("/api/users/auth/profile");
-            expect(profileResponse.statusCode).toBe(200);
-            expect(profileResponse.body).toEqual({ "message": "User Profile" });
+          // Verify second user session
+          const profileResponse = await secondAgent.get("/api/users/auth/profile");
+          expect(profileResponse.statusCode).toBe(200);
+          expect(profileResponse.body).toEqual({ "message": "User Profile" });
 
         })
     })

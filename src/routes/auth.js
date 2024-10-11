@@ -37,21 +37,12 @@ router.post(
 
             request.logIn(user, async (err) => {
                 if (!request.user) {
-                    response.status(401).send({ message: "Access Denied" }) 
+                    return response.status(401).send({ message: "Access Denied" }) 
                 } else {
-                    response.status(200).send({message: "Successfully authenticated!"});
+                    return response.status(200).send({message: "Successfully authenticated!"});
                 }
                 
-                // console.log(request.user)
-                // console.log(request.session)
                 
-                request.sessionStore.get(request.session.id, (err, sessionData) => {
-                    if (err) {
-                        console.log(err);
-                        throw err;
-                    }
-                    //console.log(sessionData);
-                })
             })
         })(request, response, next); // passing the arguments to `passport.authenticate`
     }
