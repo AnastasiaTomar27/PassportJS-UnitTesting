@@ -26,6 +26,10 @@ passport.use("local",
             if (!findUser) throw new Error("User not found");
             const isMatch = await findUser.comparePassword(password);
             if (!isMatch) throw new Error("Bad Credentials");
+
+            if (findUser.deletedAt) {
+                throw new Error("User deleted");
+            }
             done(null, findUser);
         } catch (err) {
             done(err, null);
