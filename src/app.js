@@ -25,7 +25,7 @@ app.use(cookieParser("session js learning")); // it makes the cookies easily rea
 app.use(
     session({
         name: "connect.sid",
-        secret: "550b675cf9664e9035f9cd4f2d786bb9647f80b28fca7cc37b6f95b0173d9228d0fcfc00d3b5437f4896eff783c121b72afed4022b9fdd952a6e5a5f3d2eabb3",
+        secret: "s6>?[Ty^AqQGd7$!k]j:5w%bDKr)aS;/&_,+4uVR@fYP-L(H{8fW*$Q`/k%+E92axVdbHsJ;LD-35^ZK('>]t$,/b+^Xd;.2hT7]~K_<jrQHR3JWw[E&UZ)Vv!9gc>6DhW'Z_N!*mwzqSC;v~UDj9,M-Kt)}$e7n{:f6P=<r/g^A>cx?8t<E.,DJ`6r>Y4mqkdhXSMvT)K;^y8[9#FUW*L$3!scu2(V]&7",
         saveUninitialized: false, // false means only when we modife session data ogbect, data will be stored to the session store 
         resave: false, // false means it will not resave cookies every time, expired date wil stay the same
         cookie: {

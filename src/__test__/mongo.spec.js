@@ -31,16 +31,18 @@ var testSession = null;
 let secondAgent;
 
 beforeEach(async () => {
-    await User.deleteMany({});
+    await User.deleteMany({}); // Clear the collection before each test
 
-    const response = await request(app).post('/api/users/register').send(user1)
-    
-    userId = response.body._id;
-    agent = request.agent(app);
-    testSession = session(app);
+        // Creating users directly in the database using Mongoose  instead of making HTTP requests via request(app).post('/api/users/register')
+    const $user1 = await User.create(user1);
+    const $user2 = await User.create(user2);
+
+    userId = $user1._id;
+    agent = request.agent(app); // Creating a session agent
+    testSession = session(app); // For handling session in tests
 
     await agent.post('/api/users/auth').send({
-        username:user1.username,
+        username: user1.username,
         password: user1.password
     });    
 });
@@ -53,7 +55,7 @@ describe("Session test", () => {
           .end(done)
       });
       
-    it('should sign in', function (done) {
+    it('should register user', function (done) {
     testSession.post('/api/users/register')
         .send({ username: 'foo', password: 'Password1', displayName: 'Foo' })
         .expect(201)
