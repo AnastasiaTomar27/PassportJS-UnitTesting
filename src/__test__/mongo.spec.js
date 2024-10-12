@@ -4,10 +4,6 @@ const User = require('../mongoose/schemas/user');
 const session = require('supertest-session');
 const { disconnectDB } = require('../mongoose/connection');
 
-// beforeAll (async() => {
-//     await connectDB();
-//     console.log("Connected to in-memory MongoDB");
-// });
 afterAll (async() => {
     await disconnectDB();
     console.log("Disconnected from in-memory MongoDB");
@@ -39,12 +35,7 @@ beforeEach(async () => {
 
     userId = $user1._id;
     agent = request.agent(app); // Creating a session agent
-    testSession = session(app); // For handling session in tests
-
-    await agent.post('/api/users/auth').send({
-        username: user1.username,
-        password: user1.password
-    });    
+    testSession = session(app); // For handling session in tests   
 });
 
 
@@ -430,11 +421,21 @@ describe("user profile access", () => {
     })
     describe("user authenticated", () => {
         test('should respond with a message "User Profile"', async () => {
-            const response = await agent.get("/api/users/auth/profile");
-            expect(response.body).toEqual({ "message": "User Profile" })
-        })
-    })
-})
+            // Log the user in before the test
+          await agent.post('/api/users/auth').send({
+            username: user1.username,
+            password: user1.password
+          });  
+          
+        // Perform the test
+          const response = await agent.get("/api/users/auth/profile");
+          expect(response.body).toEqual({ "message": "User Profile" });
+          
+          // Log out
+          await agent.post("/api/users/auth/logout");
+        });
+    });
+});
 describe("User logout", () => {
     describe("user not authenticated", () => {
         test('should respond with a message "Not Authenticated" and a 401 status code', async () => {
@@ -445,16 +446,18 @@ describe("User logout", () => {
     })
     describe("user authenticated", () => {
         test('should respond with a message "Successfully logged out" and a 200 status code', async () => {
-            const response = await agent.post("/api/users/auth/logout");
-            expect(response.statusCode).toBe(200)
-            expect(response.body).toEqual({ "message": "Successfully logged out" })
-
+          await agent.post('/api/users/auth').send({
+            username:user1.username,
+            password: user1.password
+          });  
+          const response = await agent.post("/api/users/auth/logout");
+          expect(response.statusCode).toBe(200)
+          expect(response.body).toEqual({ "message": "Successfully logged out" })
+          // Log out 
+          await agent.post("/api/users/auth/logout");
         })
     })
-    afterEach(async () => {
-      // Log out 
-      await agent.post("/api/users/auth/logout");
-    })
+    
 })
 describe("Switching sessions", () => {
     describe("one user logout and another user log in", () => {
@@ -463,7 +466,7 @@ describe("Switching sessions", () => {
           await agent.post('/api/users/auth').send({
             username:user1.username,
             password: user1.password
-        });   
+          });   
           // log out as a first user
           await agent.post("/api/users/auth/logout");
           
