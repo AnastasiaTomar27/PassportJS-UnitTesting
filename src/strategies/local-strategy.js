@@ -2,17 +2,18 @@ const passport = require('passport');
 const { Strategy } = require('passport-local');
 const  User  = require('@user');
 
-passport.serializeUser((user, done) => { // to tell passport how to serialize user data into the session (it stores user ID to session data)
+// Called when the user logs in. It saves their ID in the session.
+passport.serializeUser((user, done) => { 
     //console.log('Inside Serialize User');
     done(null, user.id);
 })
 
-passport.deserializeUser(async (id, done) => { // to take that ID and unpack, reveal who the actual user is (searcheas for the user in database or in array) and then it stores that user object into the request object (then we can reference request.user when we make requests)
+// Called on every request after login. It fetches the user info based on the saved session ID and attaches it to req.user, so you can use it in your route handlers.
+passport.deserializeUser(async (id, done) => { 
     //console.log('Inside Deserializer');
     //console.log(`Deserializing User ID: ${id}`);
     try {
         const findUser = await User.findById(id);
-        // if (!findUser) throw new Error("User Not Found");
         if (!findUser) {
             done(null);
         }
@@ -28,17 +29,17 @@ passport.use("local",
             const findUser = await User.findOne({ username });
             // if (!findUser) throw new Error("User not found");
             if (!findUser) {
-                return done(null, { message: "User not found" });
+                return done(null, false); //null - no errors on the server side, false - error in user auth
             }
             const isMatch = await findUser.comparePassword(password);
             // if (!isMatch) throw new Error("Bad Credentials");
             if (!isMatch) {
-                return done(null, { message: "Invalid credentials" });
+                return done(null, false);
             }
 
             if (findUser.deletedAt) {
                 // throw new Error("User deleted");
-                return done(null, { message: "User account deleted" });
+                return done(null, false);
             }
             done(null, findUser);
         } catch (err) {

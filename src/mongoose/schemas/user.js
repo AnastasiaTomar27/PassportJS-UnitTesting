@@ -12,13 +12,22 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.String,
         required: true
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin'], 
+        default: 'user'
+    },
     deletedAt: {
         type: Date,
         default: null
     }
-});
+},
+{
+    timestamps: true
+}
+);
 
-//Hash password before saving the user document
+// The pre('save') middleware ensures that the password is hashed before a user record is saved in the database.
 UserSchema.pre('save', async function (next) {
     const user = this;
 
@@ -29,8 +38,8 @@ UserSchema.pre('save', async function (next) {
 
     // Generate a salt and hash the password
     try {
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(user.password, salt);
+        const salt = await bcrypt.genSalt(10); // A "salt" is a random string added to the password to make the hash more secure. (for ex salt = r4nd0mStr1ng.)
+        const hash = await bcrypt.hash(user.password, salt); // The password mySecret123 and the salt r4nd0mStr1ng are combined and hashed using bcrypt. (hashed password = $2b$10$eW6U...O2Dn1CR.)
         user.password = hash;
         next();
     } catch (err) {
@@ -38,7 +47,7 @@ UserSchema.pre('save', async function (next) {
     }
 });
 
-// Instance method to compare plain password with the hashed password
+// The comparePassword method checks if the user’s input matches the hashed password stored in the database.
 UserSchema.methods.comparePassword = async function (plainPassword) {
     return bcrypt.compare(plainPassword, this.password);
 };

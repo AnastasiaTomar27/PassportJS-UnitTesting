@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
     "start:dev": "nodemon ./src/index.js",
     "start": "node ./src/index.js"
   },
@@ -12,17 +12,18 @@
     "@constants": "src/utils/constants.js",
     "@authSchemas": "src/utils/authSchemas.js",
     "@local-strategy": "src/strategies/local-strategy.js",
-    "@root": "src/routes/root.js",
-    "@users": "src/routes/users.js",
-    "@cart": "src/routes/cart.js",
-    "@products": "src/routes/products.js",
-    "@auth": "src/routes/auth.js",
+    "@controllersRoot": "src/controllers/root.js",
+    "@controllersUsers": "src/controllers/users.js",
+    "@controllersCart": "src/controllers/cart.js",
+    "@controllersProducts": "src/controllers/products.js",
     "@cartValidationSchemas": "src/utils/cartValidationSchemas.js",
     "@validationSchemas": "src/utils/validationSchemas.js",
     "@isAuthenticated": "src/utils/isAuthenticatedMiddleware.js",
     "@mongooseConnection": "src/mongoose/connection.js",
     "@user": "src/mongoose/schemas/user.js",
-    "@helpers": "src/utils/helpers"
+    "@helpers": "src/utils/helpers",
+    "@routesUsers": "src/routes/users.js",
+    "@restrict": "src/utils/restrict.js"
   },
   "_moduleDirectories": [
     "src",

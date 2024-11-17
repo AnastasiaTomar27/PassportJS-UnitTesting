@@ -4,13 +4,5 @@ const isAuthenticated = (request, response, next) => {
     } else {
         next()
     }
-    
-    // console.log(`cokiesssssssssss ${request.session.id}`)
-    // if (!request.session.user && request.session.id) {
-    //     return response.status(401).send({message: "Not Authenticated"});
-    // } else {
-    //     next()
-    // }
 }
-
 module.exports = isAuthenticated;
