@@ -32,6 +32,7 @@ const connectDB = async () => {
     }
 };
 
+// Disconnects Mongoose from the database.
 const disconnectDB = async () => {
     if (!isConnected) {
         console.log('Not connected');

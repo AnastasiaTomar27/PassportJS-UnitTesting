@@ -2,7 +2,7 @@ const { validationResult, matchedData, body } = require('express-validator');
 const passport = require('@local-strategy');
 const User = require('@user');
 const mongoose = require('mongoose');
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
+//const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
 exports.register = [
     [
@@ -13,18 +13,7 @@ exports.register = [
             const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])/;
             if (!passwordRegex.test(value)) {
                 throw new Error(); }
-            }).withMessage("User password configuration is invalid"),
-    body("role").optional().isIn(['user', 'admin']).withMessage('Invalid role')
-    .custom(async (role, { req }) => {
-        // If the user selects 'admin', validate the password
-        if (role === 'admin') {
-            const { adminPassword } = req.body;
-            if (adminPassword !== ADMIN_PASSWORD) {
-                throw new Error('Incorrect admin password.');
-            }
-        }
-        return true;
-    }).withMessage('Role selection failed.')   
+            }).withMessage("User password configuration is invalid")
     ],
     async (request, response) => {
         const result = validationResult(request);
@@ -34,9 +23,14 @@ exports.register = [
         }     
 
         const data = matchedData(request);
-        const newUser = new User(data); // When I create or update a user document and call .save(), Mongoose triggers the pre('save') middleware.
+        const newUser = new User({ // I save to user in db only these things, allowed by user model (in case if it's strict)
+            username: data.username,
+            displayName: data.displayName,
+            password: data.password
 
-        await newUser.save()
+        }); 
+
+        await newUser.save() // When I create or update a user document and call .save(), Mongoose triggers the pre('save') middleware.
             .then((user) => {
                 return response.status(201).json({
                     success: true,
@@ -48,7 +42,7 @@ exports.register = [
                 });                    
             })
             .catch((e) => {
-                //console.error("Error while saving user:", e); 
+                console.error("Error while saving user:", e); 
                 if (e.code === 11000) {
                     return response.status(400).send({ errors: [{msg: "User already registered!"}] });
                 } else {
@@ -69,7 +63,7 @@ exports.login = [
         if (!result.isEmpty()) {
             return response.status(400).send({ errors: result.array() });
         }
-        
+
         passport.authenticate("local", (err, user, info) => {
             //console.log("err, user, info", err, user, info);
             if (err) {
@@ -84,16 +78,21 @@ exports.login = [
             // It attaches the authenticated user to req.user for this specific request only.
             request.logIn(user, async (err) => { 
                 if (err) {
-                    // Handle the error in case `logIn` fails
                     return response.status(500).json({ errors: [{ msg: "Failed to log in user" }] });
                 }
 
+                const responseData = {
+                    name: user.username,
+                    displayName: user.displayName
+                }
+
+                if (user.role === 'admin') {
+                    responseData.role = user.role;
+                }
+
                 return response.status(200).json({
-                    message: "User successfully authenticated!",
-                    data: {
-                        name: user.username,
-                        displayName: user.displayName
-                    }
+                    message: "Successfully authenticated!",
+                    data: responseData
                 }); 
             });
         })(request, response, next); // passing the arguments to `passport.authenticate`
@@ -101,12 +100,18 @@ exports.login = [
 ]
 
 exports.profile = async (request, response) => {
+    const responseData = {
+        name: request.user.username,
+        displayName: request.user.displayName
+    }
+
+    if (request.user.role === 'admin') {
+        responseData.role = request.user.role;
+    }
+
     return response.status(200).json({
         message: `Hello, ${request.user.username}!`,
-        data: {
-            name: request.user.username,
-            displayName: request.user.displayName
-        }
+        data: responseData
     });
 };
 

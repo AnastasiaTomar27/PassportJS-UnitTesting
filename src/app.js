@@ -15,12 +15,12 @@ app = express();
 
 connectDB()
 
-app.use(express.json()); // telling Express to allow json data to be posted to the server
-app.use(cookieParser("session js learning")); // it makes the cookies easily readable from the request.cookies
+app.use(express.json()); // allows the server to handle JSON requests.
+app.use(cookieParser("session js learning")); // helps to read and manage cookies in requests.
 
 if (process.env.NODE_ENV === 'test') {
-    // In-memory session store for tests to avoid MongoDB connection issues during testing
-    const sessionMemoryStore = new session.MemoryStore();  // In-memory session store
+    // In-memory session store for tests 
+    const sessionMemoryStore = new session.MemoryStore();  // This avoids needing MongoDB during tests.
     app.use(
         session({
             name: "connect.sid",
@@ -44,8 +44,9 @@ if (process.env.NODE_ENV === 'test') {
             cookie: {
                 maxAge: 60000 * 60, // 1 hour
             },
-            store: MongoStore.create({
-                client: mongoose.connection.getClient(), // Use actual MongoDB client in production
+            // // sessions are stored in MongoDB using connect-mongo. 
+            store: MongoStore.create({ // The .create() method initializes and configures the session store.
+                client: mongoose.connection.getClient(), // my app is already using Mongoose to manage the database connection. mongoose.connection.getClient() gives MongoStore access to that same connection.
             }),
         })
     );
