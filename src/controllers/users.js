@@ -2,7 +2,6 @@ const { validationResult, matchedData, body } = require('express-validator');
 const passport = require('@local-strategy');
 const User = require('@user');
 const mongoose = require('mongoose');
-//const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
 exports.register = [
     [
@@ -23,7 +22,7 @@ exports.register = [
         }     
 
         const data = matchedData(request);
-        const newUser = new User({ // I save to user in db only these things, allowed by user model (in case if it's strict)
+        const newUser = new User({ // I save to user in db only these things, allowed by user schema (in case if it's strict)
             username: data.username,
             displayName: data.displayName,
             password: data.password
@@ -55,7 +54,7 @@ exports.register = [
 exports.login = [ 
     [
         body("username").notEmpty().isString(),
-        body("password").notEmpty()
+        body("password").notEmpty().isString()
     ],
     async (request, response, next) => {
         const result = validationResult(request);
