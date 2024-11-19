@@ -344,7 +344,8 @@ describe("GET /api/getall", () => {
             expect.arrayContaining([
                 expect.objectContaining({
                     name: user1.username,
-                    displayName: user1.displayName
+                    displayName: user1.displayName,
+                    userId: userId.toString() // The userId in MongoDB is typically represented as an ObjectId type, which is different from a regular JavaScript string.
                 }),
                 
             ])
@@ -548,7 +549,8 @@ describe("delete user", () => {
             expect(deletedUser).not.toBeNull();
             expect(deletedUser.deletedAt).toBeDefined();
         })
-    })
+    });
+
     describe("user doesn't exist", () => {
         test('should respond with a 404 status and a message that user cannot be find', async () => {
             await agent.post('/api/login')

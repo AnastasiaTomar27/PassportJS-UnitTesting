@@ -120,7 +120,7 @@ exports.logout =  async (request, response) => {
         await new Promise((resolve, reject) => {
             request.logout((err) => {
                 if (err) {
-                    reject(err);  // Reject if there's an error during logout
+                    reject(err); 
                 } else {
                     resolve();  // Resolve when logout is successful
                 }
@@ -130,27 +130,26 @@ exports.logout =  async (request, response) => {
         // Destroy the session after logging out
         request.session.destroy((err) => {
             if (err) {
-                return response.status(500).json({ errors: [{ msg: "Failed to destroy session" }] });
+                return response.status(500).json({ errors: [{ msg: "An error occurred during logout" }] });
             }
 
-            // Successfully logged out and session destroyed
             return response.status(200).json({ message: "Successfully logged out" });
         });
 
     } catch (err) {
-        // If logout failed
         return response.status(500).json({ errors: [{ msg: "Logout failed" }] });
     }
 };
 
-// no restrictions for the route
+// only admin can access route
 exports.getall = async (request, response) => {
     try {
         const users = await User.find();
         
         const userData = users.map(user => ({
             name: user.username,        
-            displayName: user.displayName
+            displayName: user.displayName,
+            userId: user._id
         }));
         
         return response.status(200).json({
@@ -183,7 +182,7 @@ exports.getbyid = async (request, response) => {
             }
         });
     } catch(error) {
-        next(error); // it passes error to global error handler in application.js
+        next(error); // it passes error to global error handler in app.js (msg: "Internal server error. Please try again later.")
     }
 };
 
@@ -194,7 +193,7 @@ exports.update = async (request, response) => {
         return response.status(400).json({ message: "Invalid ID format" });
     }
     try {
-        const updatedUser = await User.findByIdAndUpdate(userId, request.body, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(userId, request.body, { new: true }); // The properties of the request.body object will overwrite the corresponding fields in the found document. {new: true} - It specifies that the method should return the updated document after the update is applied.
         if (!updatedUser) {
             return response.status(404).json({errors: [{msg: `Cannot find any user with ID ${userId}` }] })
         }
@@ -222,7 +221,7 @@ exports.deleteUser = async (request, response) => {
         if (!user) {
             return response.status(404).json({message: `Cannot find any user with ID ${userId}` })
         }
-        await User.findByIdAndUpdate(userId, {...user._doc, deletedAt: new Date() });
+        await User.findByIdAndUpdate(userId, {...user._doc, deletedAt: new Date() }); // The spread operator (...) creates a shallow copy of all the fields in the user._doc object. This ensures that the updated document retains all its original fields.
         response.status(200).json({message: "User deleted successfully"});
     } catch(error) {
         return response.status(500).json({errors: [{ msg: `Error deliting user with ID ${userId}` }] });

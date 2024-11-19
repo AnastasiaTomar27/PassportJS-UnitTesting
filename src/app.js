@@ -52,7 +52,6 @@ if (process.env.NODE_ENV === 'test') {
     );
 }
 
-
 app.use(passport.initialize());
 app.use(passport.session()); 
 app.use("/api", routes);
