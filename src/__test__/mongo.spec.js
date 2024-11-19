@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const User = require('../mongoose/schemas/user');
 const session = require('supertest-session');
 const { disconnectDB } = require('../mongoose/connection');
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
 afterAll (async() => {
     await disconnectDB();
@@ -25,8 +24,7 @@ const adminUser = {
     username: 'admin123',
     displayName: 'Admin User',
     password: "Hello123",
-    role: 'admin',
-    adminPassword: ADMIN_PASSWORD
+    role: 'admin'
 };
 
 let userId;
@@ -122,8 +120,7 @@ describe("Register user", () => {
                 path: 'username',
                 location: 'body'
               });
-    
-        })
+        });
         
         it("should fail if password does not meet the criteria (missing uppercase)", async () => {
             const response = await request(app)
@@ -225,7 +222,7 @@ describe("Register user", () => {
 });
 
 describe("Authentication - Log in user", () => { 
-    describe("Logging with valid credentials", () => {
+    describe("Logging with valid credentials as a user", () => {
         it('Should login for a user', async () => {
             const response = await request(app).post('/api/login')
             .send({
@@ -234,10 +231,37 @@ describe("Authentication - Log in user", () => {
             });
             expect(response.statusCode).toEqual(200);
             expect(response.body).toEqual({
-              "message": "User successfully authenticated!",
+              "message": "Successfully authenticated!",
               "data": {
                   "displayName": "User123",
                   "name": "user123"
+              }
+          });
+        })      
+    });
+    describe("Logging with valid credentials as an admin", () => {
+        it('Should login for an admin', async () => {
+            const user = new User({
+                username: "Anastasia",
+                displayName: "anastasia",
+                password: "Password123",
+                role: "admin"
+
+            });
+            await user.save();
+
+            const response = await request(app).post('/api/login')
+            .send({
+                username: "Anastasia",
+                password: "Password123"
+            });
+            expect(response.statusCode).toEqual(200);
+            expect(response.body).toEqual({
+              "message": "Successfully authenticated!",
+              "data": {
+                  "displayName": "anastasia",
+                  "name": "Anastasia",
+                  "role": "admin"
               }
           });
         })      
@@ -268,6 +292,16 @@ describe("Authentication - Log in user", () => {
         const response = await request(app).post('/api/login')
         .send({
             username: user1.username
+        });
+
+        expect(response.statusCode).toEqual(400);
+        expect(response.body.errors[0].msg).toBe("Invalid value");
+      });
+      it('PASSWORD IS NOT A STRING: Should return status 400 and error', async () => {
+        const response = await request(app).post('/api/login')
+        .send({
+            username: user1.username,
+            password: 123
         });
 
         expect(response.statusCode).toEqual(400);
@@ -562,7 +596,7 @@ describe("user profile access", () => {
             expect(response.body).toEqual({ "message": "Not Authenticated" })
         })
     })
-    describe("user authenticated", () => {
+    describe("user authenticated as a user, not admin", () => {
         test('should respond with a message "User Profile"', async () => {
           await agent.post('/api/login').send({
             username: user1.username,
@@ -576,6 +610,25 @@ describe("user profile access", () => {
                 data: {
                     displayName: "User123",
                     name: "user123"
+                }
+            });
+        });
+    });
+    describe("user authenticated as an admin", () => {
+        test('should respond with a message "User Profile"', async () => {
+          await agent.post('/api/login').send({
+            username: adminUser.username,
+            password: adminUser.password
+        });  
+          
+            const response = await agent.get("/api/profile");
+
+            expect(response.body).toEqual({
+                message: "Hello, admin123!", 
+                data: {
+                    displayName: "Admin User",
+                    name: "admin123",
+                    role: "admin"
                 }
             });
         });

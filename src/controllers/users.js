@@ -41,7 +41,7 @@ exports.register = [
                 });                    
             })
             .catch((e) => {
-                console.error("Error while saving user:", e); 
+                //console.error("Error while saving user:", e); 
                 if (e.code === 11000) {
                     return response.status(400).send({ errors: [{msg: "User already registered!"}] });
                 } else {
@@ -158,7 +158,7 @@ exports.getall = async (request, response) => {
             data: userData
         });
     } catch (err) {
-        console.log(err);
+       // console.log(err);
         return response.status(500).json({ errors: [{ msg:'Error retrieving users' }] });
     }
 };
